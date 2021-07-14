@@ -799,6 +799,43 @@ def clean_image(input, output, name):
     # cv2.imwrite(r"C:\Users\emwil\Downloads\random images to send\einyitzchak-025.png", img)
 
 
+def fill_bold(csv_path):
+    print("loading in prev csv file")
+    df = pd.read_csv(csv_path, encoding='utf-8-sig')
+
+    # print("printing values:")
+    # for i in range(1,9):
+    #     print(i, df[7][i])
+
+    # print(str(df['Bolded'][3922]))
+    # print(str(df[7]['Book Name']))
+    # print(str(df[7][9]))
+
+    up_to_num = 0
+    path = r"C:\Users\emwil\Downloads\abbyy_text"
+    with os.scandir(path) as it:
+        for entry in it:
+            if entry.name.endswith(".txt") and entry.is_file():
+                print("up to file: " + entry.name)
+                # up to file: erekhhashulchan-010.txt
+                input("Press Enter when done adding stars...")
+                file = open(entry.path, 'r', encoding='utf-8-sig')
+                contents = file.read()
+                # up_to_num = 143775
+                for i in contents:
+                    if (i == '.' or i == ':' or i == ' ' or i == '\n'):
+                        continue
+                    if (i == '~'):
+                        # up to (and not including) ohelmosheresponsa-018.txt
+                        # mark previous index bold
+                        print("before " + str(df['Bolded'][up_to_num - 1]))
+                        df['Bolded'][up_to_num - 1] = True
+                        print("found bold at index: " + str(up_to_num - 1))
+                        print("after " + str(df['Bolded'][up_to_num - 1]))
+                    else:
+                        up_to_num += 1
+                df.to_csv(r'C:\Users\emwil\Downloads\csv_data.csv', encoding='utf-8-sig')
+
 
 if __name__ == '__main__':
 
@@ -838,28 +875,28 @@ if __name__ == '__main__':
 
 
 
-    total_text = []
-    # # print(df)
-    chars = []
-    counter = 0
-    # # #new files
-    names = []
-    path = r"C:\Users\emwil\Downloads\processed_images_xml"
-    with os.scandir(path) as it:
-        for entry in it:
-            if entry.name.endswith(".xml") and entry.is_file():
-                # if (entry.name == "masatbinyamin-013.tif_bold.xml"):
-                # print(entry.name, entry.path)
-                pic = entry.name.removesuffix("_bold.xml")
-                name = pic.removesuffix(".tif")
-                print("name: " + name)
-                names.append(name)
-                pic_path = r"C:\Users\emwil\Downloads\processed_images\processed_images" + os.sep + pic
-                # print("pic path: " + pic_path)
-                output_path_name = r"C:\Users\emwil\Downloads\processed_images\bolded_processed_images" + os.sep + name + ".png"
-                # print(entry.path, pic_path, output_path_name)
-                t = getCoordinates(entry.path, pic_path, output_path_name, name, chars, counter)
-                total_text.append(t)
+    # total_text = []
+    # # # print(df)
+    # chars = []
+    # counter = 0
+    # # # #new files
+    # names = []
+    # path = r"C:\Users\emwil\Downloads\processed_images_xml"
+    # with os.scandir(path) as it:
+    #     for entry in it:
+    #         if entry.name.endswith(".xml") and entry.is_file():
+    #             # if (entry.name == "masatbinyamin-013.tif_bold.xml"):
+    #             # print(entry.name, entry.path)
+    #             pic = entry.name.removesuffix("_bold.xml")
+    #             name = pic.removesuffix(".tif")
+    #             print("name: " + name)
+    #             names.append(name)
+    #             pic_path = r"C:\Users\emwil\Downloads\processed_images\processed_images" + os.sep + pic
+    #             # print("pic path: " + pic_path)
+    #             output_path_name = r"C:\Users\emwil\Downloads\processed_images\bolded_processed_images" + os.sep + name + ".png"
+    #             # print(entry.path, pic_path, output_path_name)
+    #             t = getCoordinates(entry.path, pic_path, output_path_name, name, chars, counter)
+    #             total_text.append(t)
     #
     # for i in range(len(total_text)):
     #     print(i)
@@ -874,44 +911,13 @@ if __name__ == '__main__':
 
 
 
-    input("Press Enter to continue...")
-    df = pd.DataFrame(chars, columns=['char', 'Char Num', 'size', 'cors', 'height', 'width', 'ASCII val', 'Book Name', 'Page Num', 'Bolded'])
-    df.to_csv(r'C:\Users\emwil\Downloads\csv_data.csv', encoding='utf-8-sig')
-    print("loaded data frame")
+    # input("Press Enter to continue...")
+    # df = pd.DataFrame(chars, columns=['char', 'Char Num', 'size', 'cors', 'height', 'width', 'ASCII val', 'Book Name', 'Page Num', 'Bolded'])
+    # df.to_csv(r'C:\Users\emwil\Downloads\csv_data.csv', encoding='utf-8-sig')
+    # print("loaded data frame")
 
-    # print("printing values:")
-    # for i in range(1,9):
-    #     print(i, df[7][i])
-
-    print(str(df['Bolded'][3922]))
-    # print(str(df[7]['Book Name']))
-    # print(str(df[7][9]))
-
-    up_to_num = 0
-    path = r"C:\Users\emwil\Downloads\abbyy_text"
-    with os.scandir(path) as it:
-        for entry in it:
-            if entry.name.endswith(".txt") and entry.is_file():
-                print("up to file: " + entry.name)
-                # up to file: erekhhashulchan-010.txt
-                os.system("pause")
-                input("Press Enter when done adding stars...")
-                file = open(entry.path, 'r', encoding='utf-8-sig')
-                contents = file.read()
-                # up_to_num = 143775
-                for i in contents:
-                    if (i == '.' or i == ':' or i == ' ' or i == '\n'):
-                        continue
-                    if (i == '~'):
-                        # mark previous index bold
-                        print("before " + str(df['Bolded'][up_to_num-1]))
-                        df['Bolded'][up_to_num-1] = True
-                        print("found bold at index: " + str(up_to_num -1))
-                        print("after " + str(df['Bolded'][up_to_num-1]))
-                    else:
-                        up_to_num += 1
-                input("Press Enter to finish and save...")
-                df.to_csv(r'C:\Users\emwil\Downloads\csv_data.csv', encoding='utf-8-sig')
+    csv_path = r'C:\Users\emwil\Downloads\csv_data.csv'
+    fill_bold(csv_path)
 
 
 
