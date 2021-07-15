@@ -4,6 +4,8 @@ import statistics
 import os
 from xml.etree import ElementTree as ET
 from matplotlib import pyplot as plt
+import pyxlsb
+from IPython.display import display
 
 import pickle
 import nltk
@@ -817,7 +819,6 @@ def fill_bold(csv_path):
         for entry in it:
             if entry.name.endswith(".txt") and entry.is_file():
                 print("up to file: " + entry.name)
-                # up to file: erekhhashulchan-010.txt
                 input("Press Enter when done adding stars...")
                 file = open(entry.path, 'r', encoding='utf-8-sig')
                 contents = file.read()
@@ -835,6 +836,54 @@ def fill_bold(csv_path):
                     else:
                         up_to_num += 1
                 df.to_csv(r'C:\Users\emwil\Downloads\csv_data.csv', encoding='utf-8-sig')
+
+def visualize(path):
+    df = pd.read_csv(path, encoding='utf-8-sig')
+    # print(df.axes)
+    # df.drop(['Unnamed: 0', 'Unnamed: 0.1'], axis='columns', inplace=True)
+    # print(df)
+    # df[['Left', 'Top', 'Right', 'Bottom']] = df.cors.str.split(",", expand=True)
+    # print(df.axes)
+    # df['Left'] = df['Left'].str.replace('[', '')
+    # df['Bottom'] = df['Bottom'].str.replace(']', '')
+
+    pd.set_option('display.max_columns', None)
+    df.drop('Unnamed: 0', axis='columns', inplace=True)
+    print(df.head(3))
+    # display(df)
+    # df.to_csv(r'C:\Users\emwil\Downloads\csv_data.csv', encoding='utf-8-sig')
+    # df.plot.hist(by='Bolded')
+    # p = df['height'].plot.hist(bins=300)
+    # df['height'].plot(x=['Bolded'], kind='hist', legend=True)
+    # plt.hist(df, bins=2, x='height')
+
+    df['Bolded'] = df['Bolded'].replace(True, 1)
+    df['Bolded'] = df['Bolded'].replace(False, 0)
+    # fig = plt.figure()
+    # a = fig.add_axes([0,1])
+    # a.bar(width= df['Bolded'], height =df['size'],)
+    b = df['Bolded']
+    p = df['width']
+    # for i in b:
+    #     print(i)
+    # plt.bar(x= b, height=p)
+    plt.scatter(b, p)
+    plt.xticks([0,1])
+    plt.xlabel("Bolded")
+    plt.ylabel("Width")
+    plt.show()
+    # plt.hist(data= df, x='Bolded', y='height')
+    # plt.show()
+    # plt.close()
+    # plt.hist(df, x='height', bins=20)
+    # plt.show()
+
+    # df.drop('Unnamed: 0.1.1', axis='columns', inplace=True)
+    # print(df)
+    # df.drop('Unnamed: 0.1', axis='columns', inplace=True)
+    # print(df)
+
+
 
 
 if __name__ == '__main__':
@@ -917,7 +966,10 @@ if __name__ == '__main__':
     # print("loaded data frame")
 
     csv_path = r'C:\Users\emwil\Downloads\csv_data.csv'
-    fill_bold(csv_path)
+    # fill_bold(csv_path)
+
+    excel_path = r"C:\Users\emwil\Downloads\csv_data_excel.xlsb"
+    visualize(csv_path)
 
 
 
