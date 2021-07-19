@@ -551,7 +551,7 @@ def CoordinatesUsingWords(xml, png):
     # full_name = r"C:\Users\emwil\Downloads\bolded letter average" + os.sep + name + "_test_bolded.png"
     # img_2.save(full_name, "PNG")
 
-def getCoordinates(xml, png, output, n, chars, counter):
+def getCoordinates(xml, png, output, n, chars, counter, line_loc):
     text = " "
     xml = ET.parse(xml)
     root = xml.getroot()
@@ -567,6 +567,7 @@ def getCoordinates(xml, png, output, n, chars, counter):
     text_size_dim = []
     let_sizes = []
     obj = {}
+    lc = 0
 
     # seperate name and page number
     name = n.split('-')[0]
@@ -583,12 +584,14 @@ def getCoordinates(xml, png, output, n, chars, counter):
                         for line in par:
                             # print(type(os.linesep), type('\n'))
                             # tot_text = tot_text + '\n'
+                            lc = 0
                             text = text + '\n'
                             for lang in line:
                                 for char in lang:
                                     # tot_text = tot_text + char.text
                                     text = text + char.text
                                     if (char.text == '.' or char.text == ':' or char.text == ' '):
+                                        lc += 1
                                         continue
                                     letter_count += 1
                                     letters.append(char)
@@ -609,6 +612,8 @@ def getCoordinates(xml, png, output, n, chars, counter):
                                     # total_num_chars = len(c) + 1
                                     chars.append([char.text, counter, let_size, x0_y0_x1_y1, h, w, let_num, name, page_num, False])
                                     counter += 1
+                                    line_loc.append(lc)
+                                    lc += 1
 
                                     # to check using height instead of total size
                                     # let_height = h
@@ -876,29 +881,58 @@ def visualize(path):
 
     # plt.style.use('fivethirtyeight')
     plt.style.use('seaborn')
+    color = '#fc4f30'
 
 
     #HIST
     bold = df['Bolded']
+    width_bolded = df.loc[df['Bolded'] == True, 'width']
+    width_unbolded = df.loc[df['Bolded'] == False, 'width']
     width = df['width']
     height = df['height']
+    height_bolded = df.loc[df['Bolded'] == True, 'height']
+    height_unbolded = df.loc[df['Bolded'] == False, 'height']
     size = df['size']
+    size_bolded = df.loc[df['Bolded'] == True, 'size']
+    size_unbolded = df.loc[df['Bolded'] == False, 'size']
+
+
+
     #width
+    # fig, ax = plt.subplots(3,3)
+    # ax[0,0].hist(width, bins=7, edgecolor='black')
+    # ax[0,0].set_title("Width Plot")
+    # ax[0,0].set_xlabel("Width")
+    # ax[0,0].set_ylabel("Number of Charachters in Bin")
+    # ax[0,0].tight_layout()
+    # median_age = statistics.mean(width)
+    # ax[0,0].set_axvline(median_age, color=color, label='Width Median', linewidth=2)
+    # plt.show()
+
     # plt.hist(width, bins=7, edgecolor='black')
     # plt.title("Width Plot")
     # plt.xlabel("Width")
     # plt.ylabel("Number of Charachters in Bin")
     # plt.tight_layout()
+    # median_age = statistics.mean(width)
+    # plt.axvline(median_age, color=color, label='Width Median', linewidth=2)
+    # plt.legend()
     # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\width.png", bbox_inches='tight')
     # plt.show()
+    # plt.close()
+
     #
     # plt.hist(width, bins=7, edgecolor='black', log=True)
     # plt.title("Width Log Plot")
     # plt.xlabel("Width")
     # plt.ylabel("Number of Charachters in Bin (Log)")
     # plt.tight_layout()
+    # median_age = statistics.mean(width)
+    # plt.axvline(median_age, color=color, label='Width Median', linewidth=2)
+    # plt.legend()
     # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\width_log.png", bbox_inches='tight')
-    # plt.show()
+    # # plt.show()
+    # plt.close()
     #
     # bins = [0, 5, 10, 15, 20, 25, 30]
     # plt.hist(width, bins=bins, edgecolor='black')
@@ -906,10 +940,386 @@ def visualize(path):
     # plt.xlabel("Width")
     # plt.ylabel("Number of Charachters in Bin")
     # plt.tight_layout()
+    # median_age = statistics.mean(width)
+    # plt.axvline(median_age, color=color, label='Width Median', linewidth=2)
+    # plt.legend()
     # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\width_spec.png", bbox_inches='tight')
-    # plt.show()
+    # # plt.show()
+    # plt.close()
+    #
+    # # Now for bolded and unbolded
+    # plt.hist(width_unbolded, bins=7, edgecolor='black')
+    # plt.title("Width of Unbolded Plot")
+    # plt.xlabel("Width")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # median_age = statistics.mean(width_unbolded)
+    # plt.axvline(median_age, color=color, label='Width Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\width_unbolded.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    # #
+    # plt.hist(width_unbolded, bins=7, edgecolor='black', log=True)
+    # plt.title("Width of Unbolded Log Plot")
+    # plt.xlabel("Width")
+    # plt.ylabel("Number of Charachters in Bin (Log)")
+    # plt.tight_layout()
+    # median_age = statistics.mean(width_unbolded)
+    # plt.axvline(median_age, color=color, label='Width Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\width_unbolded_log.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    # #
+    # bins = [0, 5, 10, 15, 20, 25, 30]
+    # plt.hist(width_unbolded, bins=bins, edgecolor='black')
+    # plt.title("Specific Width Unbolded Plot")
+    # plt.xlabel("Width")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # median_age = statistics.mean(width_unbolded)
+    # plt.axvline(median_age, color=color, label='Width Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\width__unbolded_spec.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    #
+    # plt.hist(width_bolded, bins=7, edgecolor='black')
+    # plt.title("Width of Bolded Plot")
+    # plt.xlabel("Width")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # median_age = statistics.mean(width_bolded)
+    # plt.axvline(median_age, color=color, label='Width Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\width_bolded.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    # #
+    # plt.hist(width_bolded, bins=7, edgecolor='black', log=True)
+    # plt.title("Width of Bolded Log Plot")
+    # plt.xlabel("Width")
+    # plt.ylabel("Number of Charachters in Bin (Log)")
+    # plt.tight_layout()
+    # median_age = statistics.mean(width_bolded)
+    # plt.axvline(median_age, color=color, label='Width Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\width_bolded_log.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    # #
+    # bins = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+    # plt.hist(width_bolded, bins=bins, edgecolor='black')
+    # plt.title("Specific Width Bolded Plot")
+    # plt.xlabel("Width")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # median_age = statistics.mean(width_bolded)
+    # plt.axvline(median_age, color=color, label='Width Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\width_bolded_spec.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    #
+    # print("Width:")
+    # print("Mean Reg: " + str(statistics.mean(width)))
+    # print("Mean unbolded: " + str(statistics.mean(width_unbolded)))
+    # print("Mean bolded: " + str(statistics.mean(width_bolded)))
+    # print("Mode Reg: " + str(statistics.mode(width)))
+    # print("Mode unbolded: " + str(statistics.mode(width_unbolded)))
+    # print("Mode bolded: " + str(statistics.mode(width_bolded)))
+    # print("Std dev Reg: " + str(statistics.stdev(width)))
+    # print("Std dev unbolded: " + str(statistics.stdev(width_unbolded)))
+    # print("Std dev bolded: " + str(statistics.stdev(width_bolded)))
+    #
+    # #height
+    # plt.hist(height, bins=7, edgecolor='black')
+    # plt.title("Height Plot")
+    # plt.xlabel("Height")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # median_age = statistics.mean(height)
+    # plt.axvline(median_age, color=color, label='Height Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\height.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    #
+    # plt.hist(height, bins=7, edgecolor='black', log=True)
+    # plt.title("Height Log Plot")
+    # plt.xlabel("Height")
+    # plt.ylabel("Number of Charachters in Bin (Log)")
+    # plt.tight_layout()
+    # median_age = statistics.mean(height)
+    # plt.axvline(median_age, color=color, label='Height Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\Height_log.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    #
+    # bins = [0, 5, 10, 15, 20, 25, 30,35, 40, 45, 50]
+    # plt.hist(height, bins=bins, edgecolor='black')
+    # plt.title("Specific Height Plot")
+    # plt.xlabel("Height")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # median_age = statistics.mean(height)
+    # plt.axvline(median_age, color=color, label='Height Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\height_spec.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    #
+    # # Now for bolded and unbolded
+    # plt.hist(height_unbolded, bins=7, edgecolor='black')
+    # plt.title("Height of Unbolded Plot")
+    # plt.xlabel("Height")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # median_age = statistics.mean(height_unbolded)
+    # plt.axvline(median_age, color=color, label='Height Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\height_unbolded.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    # #
+    # plt.hist(height_unbolded, bins=7, edgecolor='black', log=True)
+    # plt.title("Height of Unbolded Log Plot")
+    # plt.xlabel("Height")
+    # plt.ylabel("Number of Charachters in Bin (Log)")
+    # plt.tight_layout()
+    # median_age = statistics.mean(height_unbolded)
+    # plt.axvline(median_age, color=color, label='Height Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\height_unbolded_log.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    # #
+    # bins = [0, 5, 10, 15, 20, 25, 30,35, 40, 45, 50]
+    # plt.hist(height_unbolded, bins=bins, edgecolor='black')
+    # plt.title("Specific Height Unbolded Plot")
+    # plt.xlabel("Height")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # median_age = statistics.mean(height_unbolded)
+    # plt.axvline(median_age, color=color, label='Height Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\height_unbolded_spec.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    #
+    # plt.hist(height_bolded, bins=7, edgecolor='black')
+    # plt.title("Height of Bolded Plot")
+    # plt.xlabel("Height")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # median_age = statistics.mean(height_bolded)
+    # plt.axvline(median_age, color=color, label='Height Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\height_bolded.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    # #
+    # plt.hist(height_bolded, bins=7, edgecolor='black', log=True)
+    # plt.title("Height of Bolded Log Plot")
+    # plt.xlabel("Height")
+    # plt.ylabel("Number of Charachters in Bin (Log)")
+    # plt.tight_layout()
+    # median_age = statistics.mean(height_bolded)
+    # plt.axvline(median_age, color=color, label='Height Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\height_bolded_log.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    # #
+    # bins = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]
+    # plt.hist(height_bolded, bins=bins, edgecolor='black')
+    # plt.title("Specific Height Bolded Plot")
+    # plt.xlabel("Height")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # median_age = statistics.mean(height_bolded)
+    # plt.axvline(median_age, color=color, label='Height Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\height_bolded_spec.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    #
+    # print("Height:")
+    # print("Mean Reg: " + str(statistics.mean(height)))
+    # print("Mean unbolded: " + str(statistics.mean(height_unbolded)))
+    # print("Mean bolded: " + str(statistics.mean(height_bolded)))
+    # print("Mode Reg: " + str(statistics.mode(height)))
+    # print("Mode unbolded: " + str(statistics.mode(height_unbolded)))
+    # print("Mode bolded: " + str(statistics.mode(height_bolded)))
+    # print("Std dev Reg: " + str(statistics.stdev(height)))
+    # print("Std dev unbolded: " + str(statistics.stdev(height_unbolded)))
+    # print("Std dev bolded: " + str(statistics.stdev(height_bolded)))
+    #
+    # # Size
 
-    #height
+    #combined
+    fig, ax = plt.subplots(3,3)
+    fig.suptitle("Size Plot")
+    ax[0,0].hist(size, bins=7, edgecolor='black')
+    ax[0,0].set_title("Reg")
+    # ax[0,0].set_xlabel("Size")
+    ax[0,0].set_ylabel("Total")
+    ax[0,1].hist(size, bins=7, edgecolor='black', log=True)
+    ax[0,1].set_title("Log")
+    # ax[0,1].set_xlabel("Size Log")
+    bins = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    ax[0,2].hist(size, bins=bins, edgecolor='black')
+    ax[0,2].set_title("Specific")
+    # ax[0,2].set_xlabel("Size")
+
+    ax[1,0].hist(size_unbolded, bins=7, edgecolor='black')
+    ax[1,0].set_ylabel("Unbolded")
+    ax[1,1].hist(size_unbolded, bins=7, edgecolor='black', log=True)
+    bins = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    ax[1,2].hist(size_unbolded, bins=bins, edgecolor='black')
+
+    ax[2,0].hist(size_bolded, bins=7, edgecolor='black')
+    ax[2,0].set_ylabel("Bolded")
+    ax[2,1].hist(size_bolded, bins=7, edgecolor='black', log=True)
+    bins = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    ax[2,2].hist(size_bolded, bins=bins, edgecolor='black')
+    plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size_comp.png", bbox_inches='tight')
+    plt.show()
+
+
+    # plt.hist(size, bins=7, edgecolor='black')
+    # plt.title("Size Plot")
+    # plt.xlabel("Size")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # median_age = statistics.mean(size)
+    # plt.axvline(median_age, color=color, label='Size Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    #
+    # plt.hist(size, bins=7, edgecolor='black', log=True)
+    # plt.title("Size Log Plot")
+    # plt.xlabel("Size")
+    # plt.ylabel("Number of Charachters in Bin (Log)")
+    # plt.tight_layout()
+    # median_age = statistics.mean(size)
+    # plt.axvline(median_age, color=color, label='Size Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size_log.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    #
+    # bins = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    # plt.hist(size, bins=bins, edgecolor='black')
+    # plt.title("Specific Size Plot")
+    # plt.xlabel("Size")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # median_age = statistics.mean(size)
+    # plt.axvline(median_age, color=color, label='Size Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size_spec.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    #
+    #
+    # # Now for bolded and unbolded
+    # plt.hist(size_unbolded, bins=7, edgecolor='black')
+    # plt.title("Size of Unbolded Plot")
+    # plt.xlabel("Size")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # median_age = statistics.mean(size_unbolded)
+    # plt.axvline(median_age, color=color, label='Size Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size_unbolded.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    #
+    # #
+    # plt.hist(size_unbolded, bins=7, edgecolor='black', log=True)
+    # plt.title("Size of Unbolded Log Plot")
+    # plt.xlabel("Size")
+    # plt.ylabel("Number of Charachters in Bin (Log)")
+    # plt.tight_layout()
+    # median_age = statistics.mean(size_unbolded)
+    # plt.axvline(median_age, color=color, label='Size Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size_unbolded_log.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    #
+    # # bins = [0, 5, 10, 15, 20, 25, 30]
+    # bins = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    # plt.hist(size_unbolded, bins=bins, edgecolor='black')
+    # plt.title("Specific Size Unbolded Plot")
+    # plt.xlabel("Size")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # median_age = statistics.mean(size_unbolded)
+    # plt.axvline(median_age, color=color, label='Size Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size_unbolded_spec.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    #
+    #
+    # plt.hist(size_bolded, bins=7, edgecolor='black')
+    # plt.title("Size of Bolded Plot")
+    # plt.xlabel("Size")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # median_age = statistics.mean(size_bolded)
+    # plt.axvline(median_age, color=color, label='Size Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size_bolded.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    #
+    # #
+    # plt.hist(size_bolded, bins=7, edgecolor='black', log=True)
+    # plt.title("Size of Bolded Log Plot")
+    # plt.xlabel("Size")
+    # plt.ylabel("Number of Charachters in Bin (Log)")
+    # plt.tight_layout()
+    # median_age = statistics.mean(size_bolded)
+    # plt.axvline(median_age, color=color, label='Size Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size_bolded_log.png", bbox_inches='tight')
+    # # plt.show()
+    # plt.close()
+    #
+    # #
+    # bins = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    # plt.hist(size_bolded, bins=bins, edgecolor='black')
+    # plt.title("Size Bolded Plot")
+    # plt.xlabel("Size")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # median_age = statistics.mean(size_bolded)
+    # plt.axvline(median_age, color=color, label='Size Median', linewidth=2)
+    # plt.legend()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size_bolded_spec.png", bbox_inches='tight')
+    # plt.close()
+    # # plt.show()
+    #
+    # print("Size:")
+    # print("Mean Reg: " + str(statistics.mean(size)))
+    # print("Mean unbolded: " + str(statistics.mean(size_unbolded)))
+    # print("Mean bolded: " + str(statistics.mean(size_bolded)))
+    # print("Mode Reg: " + str(statistics.mode(size)))
+    # print("Mode unbolded: " + str(statistics.mode(size_unbolded)))
+    # print("Mode bolded: " + str(statistics.mode(size_bolded)))
+    # print("Std dev Reg: " + str(statistics.stdev(size)))
+    # print("Std dev unbolded: " + str(statistics.stdev(size_unbolded)))
+    # print("Std dev bolded: " + str(statistics.stdev(size_bolded)))
+
+
+
     # plt.hist(height, bins=7, edgecolor='black')
     # plt.title("Height Plot")
     # plt.xlabel("Height")
@@ -937,32 +1347,32 @@ def visualize(path):
     # plt.show()
 
     # size
-    plt.hist(size, bins=7, edgecolor='black')
-    plt.title("Size Plot")
-    plt.xlabel("Size")
-    plt.ylabel("Number of Charachters in Bin")
-    plt.tight_layout()
-    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size.png", bbox_inches='tight')
-    plt.show()
-
-    plt.hist(size, bins=7, edgecolor='black', log=True)
-    plt.title("Size Log Plot")
-    plt.xlabel("Size")
-    plt.ylabel("Number of Charachters in Bin (Log)")
-    plt.tight_layout()
-    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size_log.png", bbox_inches='tight')
-    plt.show()
-
-    bins = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
-    # bins = [0, 200, 400, 600, 600, 800, 1000, 1200, 1400]
-    # bins = [0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000]
-    plt.hist(size, bins=bins, edgecolor='black')
-    plt.title("Specific Size Plot")
-    plt.xlabel("Size")
-    plt.ylabel("Number of Charachters in Bin")
-    plt.tight_layout()
-    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size_spec.png", bbox_inches='tight')
-    plt.show()
+    # plt.hist(size, bins=7, edgecolor='black')
+    # plt.title("Size Plot")
+    # plt.xlabel("Size")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size.png", bbox_inches='tight')
+    # plt.show()
+    #
+    # plt.hist(size, bins=7, edgecolor='black', log=True)
+    # plt.title("Size Log Plot")
+    # plt.xlabel("Size")
+    # plt.ylabel("Number of Charachters in Bin (Log)")
+    # plt.tight_layout()
+    # # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size_log.png", bbox_inches='tight')
+    # plt.show()
+    #
+    # bins = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    # # bins = [0, 200, 400, 600, 600, 800, 1000, 1200, 1400]
+    # # bins = [0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000]
+    # plt.hist(size, bins=bins, edgecolor='black')
+    # plt.title("Specific Size Plot")
+    # plt.xlabel("Size")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size_spec.png", bbox_inches='tight')
+    # plt.show()
 
     # plt.hist(data= df, x='Bolded', y='height')
     # plt.show()
@@ -1018,27 +1428,38 @@ if __name__ == '__main__':
 
     # total_text = []
     # # # print(df)
-    # chars = []
-    # counter = 0
+    chars = []
+    counter = 0
     # # # #new files
-    # names = []
-    # path = r"C:\Users\emwil\Downloads\processed_images_xml"
-    # with os.scandir(path) as it:
-    #     for entry in it:
-    #         if entry.name.endswith(".xml") and entry.is_file():
-    #             # if (entry.name == "masatbinyamin-013.tif_bold.xml"):
-    #             # print(entry.name, entry.path)
-    #             pic = entry.name.removesuffix("_bold.xml")
-    #             name = pic.removesuffix(".tif")
-    #             print("name: " + name)
-    #             names.append(name)
-    #             pic_path = r"C:\Users\emwil\Downloads\processed_images\processed_images" + os.sep + pic
-    #             # print("pic path: " + pic_path)
-    #             output_path_name = r"C:\Users\emwil\Downloads\processed_images\bolded_processed_images" + os.sep + name + ".png"
-    #             # print(entry.path, pic_path, output_path_name)
-    #             t = getCoordinates(entry.path, pic_path, output_path_name, name, chars, counter)
+    names = []
+    line_pos = []
+    path = r"C:\Users\emwil\Downloads\processed_images_xml"
+    with os.scandir(path) as it:
+        for entry in it:
+            if entry.name.endswith(".xml") and entry.is_file():
+                # if (entry.name == "masatbinyamin-013.tif_bold.xml"):
+                # print(entry.name, entry.path)
+                pic = entry.name.removesuffix("_bold.xml")
+                name = pic.removesuffix(".tif")
+                # print("name: " + name)
+                # names.append(name)
+                pic_path = r"C:\Users\emwil\Downloads\processed_images\processed_images" + os.sep + pic
+                # print("pic path: " + pic_path)
+                output_path_name = r"C:\Users\emwil\Downloads\processed_images\bolded_processed_images" + os.sep + name + ".png"
+                # print(entry.path, pic_path, output_path_name)
+                t = getCoordinates(entry.path, pic_path, output_path_name, name, chars, counter, line_pos)
     #             total_text.append(t)
-    #
+
+    # Adding Column for Position of Charchter in Line
+    # for i in line_pos:
+    #     print(i)
+    # print(len(line_pos))
+    # df = pd.read_csv(r"C:\Users\emwil\Downloads\csv_data.csv", encoding='utf-8-sig')
+    # print(len(df['height']))
+    # df['Line Pos'] = line_pos
+    # df.to_csv(r"C:\Users\emwil\Downloads\csv_data.csv", encoding='utf-8-sig')
+
+
     # for i in range(len(total_text)):
     #     print(i)
     #     print(str(total_text[i]))
@@ -1061,7 +1482,7 @@ if __name__ == '__main__':
     # fill_bold(csv_path)
 
     excel_path = r"C:\Users\emwil\Downloads\csv_data_excel.xlsb"
-    visualize(csv_path)
+    # visualize(csv_path)
 
 
 
