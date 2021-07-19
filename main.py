@@ -847,9 +847,9 @@ def visualize(path):
     # df['Left'] = df['Left'].str.replace('[', '')
     # df['Bottom'] = df['Bottom'].str.replace(']', '')
 
-    pd.set_option('display.max_columns', None)
+    # pd.set_option('display.max_columns', None)
     df.drop('Unnamed: 0', axis='columns', inplace=True)
-    print(df.head(3))
+    # print(df.head(3))
     # display(df)
     # df.to_csv(r'C:\Users\emwil\Downloads\csv_data.csv', encoding='utf-8-sig')
     # df.plot.hist(by='Bolded')
@@ -857,21 +857,113 @@ def visualize(path):
     # df['height'].plot(x=['Bolded'], kind='hist', legend=True)
     # plt.hist(df, bins=2, x='height')
 
-    df['Bolded'] = df['Bolded'].replace(True, 1)
-    df['Bolded'] = df['Bolded'].replace(False, 0)
+    # df['Bolded'] = df['Bolded'].replace(True, 1)
+    # df['Bolded'] = df['Bolded'].replace(False, 0)
     # fig = plt.figure()
     # a = fig.add_axes([0,1])
     # a.bar(width= df['Bolded'], height =df['size'],)
-    b = df['Bolded']
-    p = df['width']
-    # for i in b:
-    #     print(i)
+    # b = df['Bolded']
+    # p = df['width']
+
     # plt.bar(x= b, height=p)
-    plt.scatter(b, p)
-    plt.xticks([0,1])
-    plt.xlabel("Bolded")
-    plt.ylabel("Width")
+
+    # scatter plot
+    # plt.scatter(b, p)
+    # plt.xticks([0,1])
+    # plt.xlabel("Bolded")
+    # plt.ylabel("Width")
+    # plt.show()
+
+    # plt.style.use('fivethirtyeight')
+    plt.style.use('seaborn')
+
+
+    #HIST
+    bold = df['Bolded']
+    width = df['width']
+    height = df['height']
+    size = df['size']
+    #width
+    # plt.hist(width, bins=7, edgecolor='black')
+    # plt.title("Width Plot")
+    # plt.xlabel("Width")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\width.png", bbox_inches='tight')
+    # plt.show()
+    #
+    # plt.hist(width, bins=7, edgecolor='black', log=True)
+    # plt.title("Width Log Plot")
+    # plt.xlabel("Width")
+    # plt.ylabel("Number of Charachters in Bin (Log)")
+    # plt.tight_layout()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\width_log.png", bbox_inches='tight')
+    # plt.show()
+    #
+    # bins = [0, 5, 10, 15, 20, 25, 30]
+    # plt.hist(width, bins=bins, edgecolor='black')
+    # plt.title("Specific Width Plot")
+    # plt.xlabel("Width")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\width_spec.png", bbox_inches='tight')
+    # plt.show()
+
+    #height
+    # plt.hist(height, bins=7, edgecolor='black')
+    # plt.title("Height Plot")
+    # plt.xlabel("Height")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\height.png", bbox_inches='tight')
+    # plt.show()
+    #
+    # plt.hist(height, bins=7, edgecolor='black', log=True)
+    # plt.title("Height Log Plot")
+    # plt.xlabel("Height")
+    # plt.ylabel("Number of Charachters in Bin (Log)")
+    # plt.tight_layout()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\height_log.png", bbox_inches='tight')
+    # plt.show()
+
+    # bins = [0, 7, 14, 21, 28, 35, 42, 49, 56]
+    # bins =[0,5,10,15,20,25,30,35]
+    # plt.hist(width, bins=bins, edgecolor='black')
+    # plt.title("Specific Height Plot")
+    # plt.xlabel("Height")
+    # plt.ylabel("Number of Charachters in Bin")
+    # plt.tight_layout()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\height_spec.png", bbox_inches='tight')
+    # plt.show()
+
+    # size
+    plt.hist(size, bins=7, edgecolor='black')
+    plt.title("Size Plot")
+    plt.xlabel("Size")
+    plt.ylabel("Number of Charachters in Bin")
+    plt.tight_layout()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size.png", bbox_inches='tight')
     plt.show()
+
+    plt.hist(size, bins=7, edgecolor='black', log=True)
+    plt.title("Size Log Plot")
+    plt.xlabel("Size")
+    plt.ylabel("Number of Charachters in Bin (Log)")
+    plt.tight_layout()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size_log.png", bbox_inches='tight')
+    plt.show()
+
+    bins = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    # bins = [0, 200, 400, 600, 600, 800, 1000, 1200, 1400]
+    # bins = [0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000]
+    plt.hist(size, bins=bins, edgecolor='black')
+    plt.title("Specific Size Plot")
+    plt.xlabel("Size")
+    plt.ylabel("Number of Charachters in Bin")
+    plt.tight_layout()
+    # plt.savefig(r"C:\Users\emwil\Downloads\Data Pics\size_spec.png", bbox_inches='tight')
+    plt.show()
+
     # plt.hist(data= df, x='Bolded', y='height')
     # plt.show()
     # plt.close()
