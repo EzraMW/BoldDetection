@@ -551,7 +551,7 @@ def CoordinatesUsingWords(xml, png):
     # full_name = r"C:\Users\emwil\Downloads\bolded letter average" + os.sep + name + "_test_bolded.png"
     # img_2.save(full_name, "PNG")
 
-def getCoordinates(xml, png, output, n, chars, counter, line_loc):
+def getCoordinates(xml, png, output, n, chars, counter):
     text = " "
     xml = ET.parse(xml)
     root = xml.getroot()
@@ -574,8 +574,8 @@ def getCoordinates(xml, png, output, n, chars, counter, line_loc):
     page_num = n.split('-')[1]
     print("name and page: " + str(name) + " " + str(page_num))
 
-    for i in range(1, 20000):
-        obj['size_' + str(i)] = []
+    # for i in range(1, 20000):
+    #     obj['size_' + str(i)] = []
     for page in root:
         for block in page:
             for t in block:
@@ -599,20 +599,23 @@ def getCoordinates(xml, png, output, n, chars, counter, line_loc):
                                     top = int(char.attrib['t'])
                                     right = int(char.attrib['r'])
                                     bottom = int(char.attrib['b'])
-                                    x0_y0_x1_y1 = [left, top, right, bottom]
+                                    x0_y0_x1_y1 = (left, top, right, bottom)
                                     w = right - left
                                     h = bottom - top
                                     let_size = w * h
                                     let_num = ord(char.text)
                                     # print(ord(char.text), char.text)
-                                    obj['size_' + str(let_num)].append(let_size)
+                                    # obj['size_' + str(let_num)].append(let_size)
                                     let_sizes.append(let_size)
                                     text_size_dim.append([char.text, let_size, x0_y0_x1_y1])
                                     total_letter_size += let_size
                                     # total_num_chars = len(c) + 1
-                                    chars.append([char.text, counter, let_size, x0_y0_x1_y1, h, w, let_num, name, page_num, False])
+                                    # Order is: 1) Book Name, 2) Page Number, 3) Char, 4) Bolded, 5) Coordinates, 6) Size, 7) Height, 8) Width
+                                    # 9) ASCII val, 10) counter, 11) Line Location, 12) Left, 13) Right, 14) Top, 15) Bottom
+                                    chars.append([name, page_num, char.text, False, x0_y0_x1_y1, let_size, h, w, let_num, counter, lc, left, right, top, bottom])
+                                    # chars.append([char.text, counter, let_size, x0_y0_x1_y1, h, w, let_num, name, page_num, False])
                                     counter += 1
-                                    line_loc.append(lc)
+                                    # line_loc.append(lc)
                                     lc += 1
 
                                     # to check using height instead of total size
@@ -809,6 +812,8 @@ def clean_image(input, output, name):
 def fill_bold(csv_path):
     print("loading in prev csv file")
     df = pd.read_csv(csv_path, encoding='utf-8-sig')
+    # df = pd.read_excel(csv_path)
+    # pd.read_excel()
 
     # print("printing values:")
     # for i in range(1,9):
@@ -823,24 +828,31 @@ def fill_bold(csv_path):
     with os.scandir(path) as it:
         for entry in it:
             if entry.name.endswith(".txt") and entry.is_file():
+                # if (entry.path != r"C:\Users\emwil\Downloads\abbyy_text\kerenora2-002.txt"):
+                #     continue
                 print("up to file: " + entry.name)
-                input("Press Enter when done adding stars...")
+                # input("Press Enter when done adding stars...")
                 file = open(entry.path, 'r', encoding='utf-8-sig')
                 contents = file.read()
-                # up_to_num = 143775
+                print("up to: " + str(up_to_num))
+                # up_to_num = 117762
                 for i in contents:
                     if (i == '.' or i == ':' or i == ' ' or i == '\n'):
                         continue
                     if (i == '~'):
                         # up to (and not including) ohelmosheresponsa-018.txt
                         # mark previous index bold
-                        print("before " + str(df['Bolded'][up_to_num - 1]))
+                        # print("before " + str(df['Bolded'][up_to_num - 1]))
+                        # print("up to: " + str(up_to_num-1))
+                        # print(df['char'][up_to_num-1])
                         df['Bolded'][up_to_num - 1] = True
-                        print("found bold at index: " + str(up_to_num - 1))
-                        print("after " + str(df['Bolded'][up_to_num - 1]))
+                        # print("found bold at index: " + str(up_to_num - 1))
+                        # print("after " + str(df['Bolded'][up_to_num - 1]))
                     else:
                         up_to_num += 1
-                df.to_csv(r'C:\Users\emwil\Downloads\csv_data.csv', encoding='utf-8-sig')
+                # df.to_excel(csv_path)
+                df.to_csv(csv_path, encoding='utf-8-sig')
+
 
 def visualize(path):
     df = pd.read_csv(path, encoding='utf-8-sig')
@@ -1385,7 +1397,102 @@ def visualize(path):
     # df.drop('Unnamed: 0.1', axis='columns', inplace=True)
     # print(df)
 
+def ground_truth_bold(path):
+    df = pd.read_csv(path, encoding='utf-8-sig')
+    prev_name = " "
+    print(type(df['Coordinates'][3]))
+    print(len(df['Bolded']))
 
+    # first lets replace each cors with a tuple
+    # tup_cor = []
+    # for index, rows in df.iterrows():
+    #     print(rows['cors'])
+    #     cor = rows['cors'].removeprefix('[').removesuffix(']').split(', ')
+    #     c = []
+    #     for i in cor:
+    #         c.append(int(i))
+    #     tup_cor.append(tuple(c))
+    # df['cors'] = tup_cor
+    # df.to_csv(path, encoding='utf-8-sig')
+    # print("done replacing column with tuples")
+    count = 0
+    # index, rows = df.iterrows()
+    # print(type(index))
+    # print(type(rows))
+    pic_bold_cors = []
+    # base = 10
+    updated_cors = []
+    b = 3
+    for rows in df.itertuples():
+        # print(rows)
+        # print(rows[b])
+        name = rows[b] + "-" + str(rows[b+1]).zfill(3) + ".tif"
+        # print(name)
+        if (rows[b] == "mishivdavar"):
+            name = rows[b] + "-" + str(rows[b+1]).zfill(2) + ".tif"
+        if (rows[b] == "zikukindenura"):
+            name = rows[b] + "-" + str(rows[b+1]) + ".tif"
+        pic = r"C:\Users\emwil\Downloads\processed_images\processed_images" + os.sep + name
+        # print([pic, rows[17], rows[11]])
+        # print(rows[b+4])
+        # print(type(rows[b+4]))
+        cor = rows[b+4].removeprefix('(').removesuffix(')').split(', ')
+        # cor = rows[b-4].removeprefix('[').removesuffix(']').split(', ')
+        c = []
+        for i in cor:
+            # c.__add__(int(i))
+            c.append(int(i))
+        pic_bold_cors.append([pic, rows[b+3], c])
+        # updated_cors.append(c)
+    print("done making list")
+    # df['cors'] = updated_cors
+    # df.to_csv(path, encoding='utf-8-sig')
+    # print(type(df['cors'][3]))
+
+
+    prev_pic = (pic_bold_cors[0])[0]
+    output = prev_pic.replace("processed_images\processed_images", "Ground Truth Pics")
+    print(output)
+    img = Image.open(prev_pic).convert('RGBA')
+    draw = ImageDraw.Draw(img)
+    for a in pic_bold_cors:
+        # print(a)
+        if a[0] != prev_pic:
+            output = prev_pic.replace("processed_images\processed_images", "Ground Truth Pics")
+            img.save(output)
+            img.close()
+            print("Next Pic: " + a[0])
+            img = Image.open(a[0]).convert('RGBA')
+            prev_pic = a[0]
+            draw = ImageDraw.Draw(img)
+        # img = Image.open(a[0]).convert('RGBA')
+        if (a[1] == True):
+            draw.rectangle(a[2], outline='red', width=1)
+        elif (a[1] == False):
+            draw.rectangle(a[2], outline='black', width=1)
+    output = prev_pic.replace("processed_images\processed_images", "Ground Truth Pics")
+    img.save(output)
+    img.close()
+
+
+        # if (name != prev_name):
+        #     print(name)
+        # prev_name = name
+        # print(pic)
+        # img_2 = img.copy()
+        # cor = rows['cors'].removeprefix('[')
+        # cor = cor.removesuffix(']')
+        # l = cor.split(', ')
+        # c = []
+        # for i in l:
+        #     c.append(int(i))
+        # t = tuple(c)
+
+        # output = r"C:\Users\emwil\Downloads\Ground Truth Pics" + os.sep + name.removesuffix(".tif") + ".png"
+        # print(output)
+        # print(count)
+        # count += 1
+        # img.save(pic)
 
 
 if __name__ == '__main__':
@@ -1426,28 +1533,28 @@ if __name__ == '__main__':
 
 
 
-    # total_text = []
-    # # # print(df)
-    chars = []
-    counter = 0
-    # # # #new files
-    names = []
-    line_pos = []
-    path = r"C:\Users\emwil\Downloads\processed_images_xml"
-    with os.scandir(path) as it:
-        for entry in it:
-            if entry.name.endswith(".xml") and entry.is_file():
-                # if (entry.name == "masatbinyamin-013.tif_bold.xml"):
-                # print(entry.name, entry.path)
-                pic = entry.name.removesuffix("_bold.xml")
-                name = pic.removesuffix(".tif")
-                # print("name: " + name)
-                # names.append(name)
-                pic_path = r"C:\Users\emwil\Downloads\processed_images\processed_images" + os.sep + pic
-                # print("pic path: " + pic_path)
-                output_path_name = r"C:\Users\emwil\Downloads\processed_images\bolded_processed_images" + os.sep + name + ".png"
-                # print(entry.path, pic_path, output_path_name)
-                t = getCoordinates(entry.path, pic_path, output_path_name, name, chars, counter, line_pos)
+    # # total_text = []
+    # # # # print(df)
+    # chars = []
+    # counter = 0
+    # # # # # #new files
+    # # names = []
+    # # line_pos = []
+    # path = r"C:\Users\emwil\Downloads\processed_images_xml"
+    # with os.scandir(path) as it:
+    #     for entry in it:
+    #         if entry.name.endswith(".xml") and entry.is_file():
+    #             # if (entry.name == "masatbinyamin-013.tif_bold.xml"):
+    #             print(entry.name, entry.path)
+    #             pic = entry.name.removesuffix("_bold.xml")
+    #             name = pic.removesuffix(".tif")
+    #             # print("name: " + name)
+    #             # names.append(name)
+    #             pic_path = r"C:\Users\emwil\Downloads\processed_images\processed_images" + os.sep + pic
+    #             # print("pic path: " + pic_path)
+    #             output_path_name = r"C:\Users\emwil\Downloads\processed_images\bolded_processed_images" + os.sep + name + ".png"
+    #             # print(entry.path, pic_path, output_path_name)
+    #             t = getCoordinates(entry.path, pic_path, output_path_name, name, chars, counter)
     #             total_text.append(t)
 
     # Adding Column for Position of Charchter in Line
@@ -1472,14 +1579,28 @@ if __name__ == '__main__':
     #     file.close()
 
 
-
+    # Loading list from getcoordinates into DataFrame
     # input("Press Enter to continue...")
     # df = pd.DataFrame(chars, columns=['char', 'Char Num', 'size', 'cors', 'height', 'width', 'ASCII val', 'Book Name', 'Page Num', 'Bolded'])
-    # df.to_csv(r'C:\Users\emwil\Downloads\csv_data.csv', encoding='utf-8-sig')
+    # Order is: 1) Book Name, 2) Page Number, 3) Char, 4) Bolded, 5) Coordinates, 6) Size, 7) Height, 8) Width
+    # 9) ASCII val, 10) counter, 11) Line Location, 12) Left, 13) Right, 14) Top, 15) Bottom
+    # print(chars[3])
+    # df = pd.DataFrame(chars, columns=['Book Name','Page Number','Char', 'Bolded', 'Coordinates', 'Size', 'Height', 'Width',
+    #                                   'ASCII val','counter', 'Line Location','Left', 'Right', 'Top', 'Bottom'])
+    # print(df.head(3))
+    # df.to_csv(r'C:\Users\emwil\cs_projects\BoldDetection\data.csv', encoding='utf-8-sig')
     # print("loaded data frame")
 
+    c_path = r'C:\Users\emwil\cs_projects\BoldDetection\data.csv'
     csv_path = r'C:\Users\emwil\Downloads\csv_data.csv'
-    # fill_bold(csv_path)
+    csv_1 = r"C:\Users\emwil\Downloads\csv_data_1.csv"
+    # csv_1 = r"C:\Users\emwil\Downloads\csv_data_1e.xlsx"
+    # fill_bold(c_path)
+    ground_truth_bold(c_path)
+
+    # ground_truth_bold(csv_path)
+    # fill_bold(csv_1)
+    # ground_truth_bold(csv_1)
 
     excel_path = r"C:\Users\emwil\Downloads\csv_data_excel.xlsb"
     # visualize(csv_path)
