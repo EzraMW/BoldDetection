@@ -421,7 +421,7 @@ def OldCoordinatesLetters(xml, png, output):
             # print("text: " + str(i[0]) + " size: " + str(i[1]))
 
     img_2.show()
-    # img_2.save(output, "PNG")
+    img_2.save(output, "PNG")
     # new = png.split("\\")
     # name = ""
     # for i in new:
@@ -593,12 +593,15 @@ def getCoordinates(xml, png, output, n, chars, counter):
                                     if (char.text == '.' or char.text == ':' or char.text == ' '):
                                         lc += 1
                                         continue
-                                    letter_count += 1
-                                    letters.append(char)
                                     left = int(char.attrib['l'])
                                     top = int(char.attrib['t'])
                                     right = int(char.attrib['r'])
                                     bottom = int(char.attrib['b'])
+                                    if ((char.text == '־' and left == 418 and top == 1238) or (char.text == 'י' and left == 415 and top == 1237) or (char.text == '~' and left == 608 and top == 215)):
+                                        print("skipping")
+                                        continue
+                                    letter_count += 1
+                                    letters.append(char)
                                     x0_y0_x1_y1 = (left, top, right, bottom)
                                     w = right - left
                                     h = bottom - top
@@ -808,10 +811,152 @@ def clean_image(input, output, name):
     # cv2.drawContours(img, contours, -1, (255, 255, 0), 1)
     # cv2.imwrite(r"C:\Users\emwil\Downloads\random images to send\einyitzchak-025.png", img)
 
+def gc(xml, png, output):
+    text = " "
+    xml = ET.parse(xml)
+    root = xml.getroot()
+    all_info_words = []
+    words = []
+    num_words = 0
+    total_size = 0
+    curr = []
+    word = []
+    total_letter_size = 0
+    letter_count = 0
+    letters = []
+    text_size_dim = []
+    let_sizes = []
+    obj = {}
+    lc = 0
+
+    # for i in range(1, 20000):
+    #     obj['size_' + str(i)] = []
+    for page in root:
+        for block in page:
+            for t in block:
+                if "text" in t.tag:
+                    for par in t:
+                        for line in par:
+                            # print(type(os.linesep), type('\n'))
+                            # tot_text = tot_text + '\n'
+                            lc = 0
+                            text = text + '\n'
+                            for lang in line:
+                                for char in lang:
+                                    # tot_text = tot_text + char.text
+                                    text = text + char.text
+                                    if (char.text == '.' or char.text == ':' or char.text == ' '):
+                                        lc += 1
+                                        continue
+                                    left = int(char.attrib['l'])
+                                    top = int(char.attrib['t'])
+                                    right = int(char.attrib['r'])
+                                    bottom = int(char.attrib['b'])
+                                    # if ((char.text == '־' and left == 418 and top == 1238) or (
+                                    #         char.text == 'י' and left == 415 and top == 1237) or (
+                                    #         char.text == '~' and left == 608 and top == 215)):
+                                    #     print("skipping")
+                                    #     continue
+                                    letter_count += 1
+                                    letters.append(char)
+                                    x0_y0_x1_y1 = (left, top, right, bottom)
+                                    w = right - left
+                                    h = bottom - top
+                                    let_size = w * h
+                                    let_num = ord(char.text)
+                                    # print(ord(char.text), char.text)
+                                    # obj['size_' + str(let_num)].append(let_size)
+                                    let_sizes.append(let_size)
+                                    text_size_dim.append([char.text, let_size, x0_y0_x1_y1])
+                                    total_letter_size += let_size
+                                    # total_num_chars = len(c) + 1
+                                    # Order is: 1) Book Name, 2) Page Number, 3) Char, 4) Bolded, 5) Coordinates, 6) Size, 7) Height, 8) Width
+                                    # 9) ASCII val, 10) counter, 11) Line Location, 12) Left, 13) Right, 14) Top, 15) Bottom
+                                    # chars.append(
+                                    #     [name, page_num, char.text, False, x0_y0_x1_y1, let_size, h, w, let_num,
+                                    #      counter, lc, left, right, top, bottom])
+                                    # # chars.append([char.text, counter, let_size, x0_y0_x1_y1, h, w, let_num, name, page_num, False])
+                                    # counter += 1
+                                    # line_loc.append(lc)
+                                    lc += 1
+
+                                    # to check using height instead of total size
+                                    # let_height = h
+                                    # obj['size_' + str(let_num)].append(let_height)
+                                    # let_sizes.append(let_height)
+                                    # text_size_dim.append([char.text, let_height, x0_y0_x1_y1])
+                                    # total_letter_size += let_height
+
+    # print("chars so far: " + str(counter))
+    # print("total num of chars so far: " + str(len(chars)))
+    # print("printing text: ")
+    # print(text)
+
+    # create text files from abbyy xml
+    # folder = r"C:\Users\emwil\Downloads\abbyy_text"
+    # file_path = folder + os.sep + n + ".txt"
+    # file = open(file_path, "w+", encoding='utf-8-sig')
+    # file.write(text)
+    # file.close()
+
+    # draw boxes around bolded words
+    if (letter_count == 0):
+        print("Did not recongnize ANY letters from this document")
+    else:
+
+        img = Image.open(png).convert('RGBA')
+        img_2 = img.copy()
+        draw = ImageDraw.Draw(img_2)
+        mean = statistics.mean(let_sizes)
+        std_dev = statistics.stdev(let_sizes)
+
+    # print("total mean: " + str(mean))
+    # print("total standard deviation: " + str(std_dev))
+
+        means = {}
+        std_devs = {}
+        for i in range(1, 20000):
+            if (len(obj['size_' + str(i)]) > 1):
+                means['mean' + str(i)] = statistics.mean(obj['size_' + str(i)])
+                std_devs['stdev' + str(i)] = statistics.stdev(obj['size_' + str(i)])
+            else:
+                means['mean' + str(i)] = 0
+                std_devs['stdev' + str(i)] = 0
+
+        print("number of letters are: " + str(len(letters)))
+        print(" ")
+        for i in means:
+            if means[i] != 0:
+                print(means[i])
+        print(" now std devs:    ")
+        for i in std_devs:
+            if (std_devs[i] != 0):
+                print(std_devs[i])
+        print(" ")
+        for i in text_size_dim:
+            num = ord(i[0])
+            if (means['mean' + str(num)] == 0 or std_devs['stdev'+str(num)] == 0):
+                continue
+            if (i[1] < (means['mean'+str(num)]+(3* std_devs['stdev'+str(num)]))):
+
+                draw.rectangle(i[2], outline="black", width=1)
+            else:
+                # print("letter: " + i[0])
+                # print("actual size: " + str(i[1]))
+                # print("mean + 3 std devs: " + str((means['mean'+str(num)]+(3* std_devs['stdev'+str(num)]))))
+                draw.rectangle(i[2], outline="red", width=1)
+        print("text: " + str(i[0]) + " size: " + str(i[1]))
+
+        img_2.show()
+        img_2.save(output, "PNG")
+
 
 def fill_bold(csv_path):
     print("loading in prev csv file")
     df = pd.read_csv(csv_path, encoding='utf-8-sig')
+    list = [False] * 293030
+    print(len(list))
+    df['Bolded'] = list
     # df = pd.read_excel(csv_path)
     # pd.read_excel()
 
@@ -825,6 +970,7 @@ def fill_bold(csv_path):
 
     up_to_num = 0
     path = r"C:\Users\emwil\Downloads\abbyy_text"
+    bool = True
     with os.scandir(path) as it:
         for entry in it:
             if entry.name.endswith(".txt") and entry.is_file():
@@ -834,9 +980,12 @@ def fill_bold(csv_path):
                 # input("Press Enter when done adding stars...")
                 file = open(entry.path, 'r', encoding='utf-8-sig')
                 contents = file.read()
-                print("up to: " + str(up_to_num))
+                # print("up to: " + str(up_to_num))
                 # up_to_num = 117762
                 for i in contents:
+                    if (bool and up_to_num == 141709):
+                        up_to_num -= 4
+                        bool = False
                     if (i == '.' or i == ':' or i == ' ' or i == '\n'):
                         continue
                     if (i == '~'):
@@ -1422,12 +1571,17 @@ def ground_truth_bold(path):
     pic_bold_cors = []
     # base = 10
     updated_cors = []
-    b = 3
+    b = 6
     for rows in df.itertuples():
         # print(rows)
         # print(rows[b])
         name = rows[b] + "-" + str(rows[b+1]).zfill(3) + ".tif"
         # print(name)
+        # if (rows[1] == 141709):
+        #     next(df.itertuples())
+        #     next(df.itertuples())
+        #     next(df.itertuples())
+        #     next(df.itertuples())
         if (rows[b] == "mishivdavar"):
             name = rows[b] + "-" + str(rows[b+1]).zfill(2) + ".tif"
         if (rows[b] == "zikukindenura"):
@@ -1498,7 +1652,7 @@ def ground_truth_bold(path):
 if __name__ == '__main__':
 
     # do stuff to get xml file
-
+    OldCoordinatesLetters(r"C:\Users\emwil\Downloads\einyitchk-46.xml", r"C:\Users\emwil\Downloads\einyitzchak-146.png", r"C:\Users\emwil\Downloads\einyitzchak-146_boxes.png")
     # # ein yitzchok
     # getCoordinates(r"C:\Users\emwil\Downloads\tests\ey_1.xml", r"C:\Users\emwil\Downloads\Telegram Desktop\einyitzchak-025.png")
     # getCoordinates(r"C:\Users\emwil\Downloads\tests\ey_2.xml", r"C:\Users\emwil\Downloads\Telegram Desktop\einyitzchak-032.png")
@@ -1533,18 +1687,19 @@ if __name__ == '__main__':
 
 
 
-    # # total_text = []
+    # total_text = []
     # # # # print(df)
     # chars = []
     # counter = 0
-    # # # # # #new files
-    # # names = []
-    # # line_pos = []
+    # # # # # # #new files
+    # # # names = []
+    # # # line_pos = []
     # path = r"C:\Users\emwil\Downloads\processed_images_xml"
     # with os.scandir(path) as it:
     #     for entry in it:
     #         if entry.name.endswith(".xml") and entry.is_file():
-    #             # if (entry.name == "masatbinyamin-013.tif_bold.xml"):
+    #             # if (entry.name != "masatbinyamin-013.tif_bold.xml"):
+    #             #
     #             print(entry.name, entry.path)
     #             pic = entry.name.removesuffix("_bold.xml")
     #             name = pic.removesuffix(".tif")
@@ -1555,6 +1710,7 @@ if __name__ == '__main__':
     #             output_path_name = r"C:\Users\emwil\Downloads\processed_images\bolded_processed_images" + os.sep + name + ".png"
     #             # print(entry.path, pic_path, output_path_name)
     #             t = getCoordinates(entry.path, pic_path, output_path_name, name, chars, counter)
+    #             # print(t)
     #             total_text.append(t)
 
     # Adding Column for Position of Charchter in Line
@@ -1596,7 +1752,7 @@ if __name__ == '__main__':
     csv_1 = r"C:\Users\emwil\Downloads\csv_data_1.csv"
     # csv_1 = r"C:\Users\emwil\Downloads\csv_data_1e.xlsx"
     # fill_bold(c_path)
-    ground_truth_bold(c_path)
+    # ground_truth_bold(c_path)
 
     # ground_truth_bold(csv_path)
     # fill_bold(csv_1)
