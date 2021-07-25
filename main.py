@@ -1652,7 +1652,7 @@ def ground_truth_bold(path):
 if __name__ == '__main__':
 
     # do stuff to get xml file
-    OldCoordinatesLetters(r"C:\Users\emwil\Downloads\einyitchk-46.xml", r"C:\Users\emwil\Downloads\einyitzchak-146.png", r"C:\Users\emwil\Downloads\einyitzchak-146_boxes.png")
+    # OldCoordinatesLetters(r"C:\Users\emwil\Downloads\einyitchk-46.xml", r"C:\Users\emwil\Downloads\einyitzchak-146.png", r"C:\Users\emwil\Downloads\einyitzchak-146_boxes.png")
     # # ein yitzchok
     # getCoordinates(r"C:\Users\emwil\Downloads\tests\ey_1.xml", r"C:\Users\emwil\Downloads\Telegram Desktop\einyitzchak-025.png")
     # getCoordinates(r"C:\Users\emwil\Downloads\tests\ey_2.xml", r"C:\Users\emwil\Downloads\Telegram Desktop\einyitzchak-032.png")
