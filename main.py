@@ -6,6 +6,8 @@ from xml.etree import ElementTree as ET
 from matplotlib import pyplot as plt
 import pyxlsb
 from IPython.display import display
+from catboost import CatBoostClassifier
+from catboost import *
 
 import pickle
 import nltk
@@ -14,6 +16,169 @@ import pandas as pd
 import numpy as np
 import cv2
 import time
+import numpy as np
+from catboost import CatBoost, Pool
+
+
+def train(csv_path):
+    # read the dataset
+    df = pd.read_csv(csv_path, encoding='utf-8-sig')
+    # train_d = df['Size'][:200000]
+
+    model = CatBoostClassifier()
+    model1 = CatBoost
+    model2 = CatBoostRegressor
+
+    # TODO init your  X_train, y_train, X_test, y_test however you do it
+    # X_train = df.loc[:, df.columns != 'Bolded', df.columns != 'Book Name', df.columns != 'Coordinates',
+    #           df.columns != 'Char'][:200000]
+    # 	Book Name	Page Number	Char	Bolded	Coordinates	Size	Height	Width	ASCII val	counter	Line Location	Left	Right	Top	Bottom
+    data = df[['Page Number', 'Size', 'Height', 'Width', 'ASCII val', 'counter', 'Line Location', 'Left', 'Right', 'Top', 'Bottom']]
+    X_train = data[:130000]
+    X_test = data[130001:]
+    # X_test = df.loc[:, df.columns != 'Bolded', df.columns != 'Book Name', df.columns != 'Coordinates',
+    #           df.columns != 'Char'][200001:]
+    y_train = df['Bolded'][:130000]
+
+    # train
+
+    model.fit(X_train, y_train)
+    # model1.fit(X_train, y_train)
+    # model2.fit(X_train, y_train)
+
+    # predict
+    y_pred = model.predict(X_test)
+    y_pred = y_pred.tolist()
+    print(y_pred)
+
+    actual_bold = df['Bolded'][130001:]
+    actual_bold = actual_bold.tolist()
+    print("actual bold")
+    print(actual_bold)
+
+    print("size of pred: " + str(len(y_pred)))
+    print(type(y_pred))
+    print("size of actual: " + str(len(actual_bold)))
+    print(type(actual_bold))
+    same = 0
+    diff = 0
+    # counter = 0
+    print(type(y_pred[3]))
+    predict = []
+    for i in y_pred:
+        if i == 'True':
+            predict.append(True)
+        elif i == 'False':
+            predict.append(False)
+    print(len(predict))
+    print(type(actual_bold[3]))
+    # false_positive = 0
+    # false_negative = 0
+    for i in range(len(predict)):
+        # if i == 0:
+        #     continue
+        # print(y_pred[i], actual_bold[i])
+        if predict[i] != actual_bold[i]:
+            # if (predict[i] == True) and (actual_bold[i] == False):
+            #     false_positive += 1
+            # elif (predict[i] == False) and (actual_bold == True):
+            #     false_negative += 1
+            diff += 1
+        else:
+            same += 1
+        # counter += 1
+    print("same: " + str(same))
+    print("diff: " + str(diff))
+    print("percentage correct: " + str(float(same/len(predict)) * 100) + "%")
+    # print("false positive: " + str(false_positive))
+    # print("false negative: " + str(false_negative))
+    # print("false positive percent: " + str(float(false_positive/diff) * 100) + "%")
+
+    # predict 1
+    # predict
+    y_pred1 = model1.predict(X_test)
+    y_pred1 = y_pred1.tolist()
+
+    print("size of pred: " + str(len(y_pred)))
+    print(type(y_pred))
+    print("size of actual: " + str(len(actual_bold)))
+    print(type(actual_bold))
+    same = 0
+    diff = 0
+    # counter = 0
+    print(type(y_pred[3]))
+    predict = []
+    for i in y_pred:
+        if i == 'True':
+            predict.append(True)
+        elif i == 'False':
+            predict.append(False)
+    print(len(predict))
+    print(type(actual_bold[3]))
+    # false_positive = 0
+    # false_negative = 0
+    for i in range(len(predict)):
+        # if i == 0:
+        #     continue
+        # print(y_pred[i], actual_bold[i])
+        if predict[i] != actual_bold[i]:
+            # if (predict[i] == True) and (actual_bold[i] == False):
+            #     false_positive += 1
+            # elif (predict[i] == False) and (actual_bold == True):
+            #     false_negative += 1
+            diff += 1
+        else:
+            same += 1
+        # counter += 1
+    print("same: " + str(same))
+    print("diff: " + str(diff))
+    # print("percentage c
+
+
+
+    #
+    # bolded_binary = []
+    # for i in df['Bolded']:
+    #     if i == True:
+    #         bolded_binary.append(1)
+    #     elif i == False:
+    #         bolded_binary.append(0)
+    # print(bolded_binary)
+    # train_l = bolded_binary[:200000]
+    # print("data: " + str(train_d))
+    # print("labels: " + str(train_l))
+    #
+    # test_d = df['Size'][200001:]
+
+    # train_data = np.random.randint(0, 100, size=(100, 10))
+    # train_labels = np.random.randint(0, 2, size=(100))
+    # test_data = np.random.randint(0, 100, size=(50, 10))
+    #
+    #
+    # print("train data: " + str(train_data))
+    # print("train labels: " + str(train_labels))
+    # print("test data: " + str(test_data))
+    #
+    # train_pool = Pool(train_d, train_l)
+    # # train_pool = Pool(train_data, train_labels)
+    # #
+    # test_pool = Pool(test_d)
+    # # test_pool = Pool(test_data)
+    # # # specify training parameters via map
+    # #
+    # param = {'iterations': 5}
+    # model = CatBoost(param)
+    # # train the model
+    # model.fit(train_pool)
+    # # make the prediction using the resulting model
+    # preds_class = model.predict(test_pool, prediction_type='Class')
+    # preds_proba = model.predict(test_pool, prediction_type='Probability')
+    # preds_raw_vals = model.predict(test_pool, prediction_type='RawFormulaVal')
+    # print("Class", preds_class)
+    # print("Proba", preds_proba)
+    # print("Raw", preds_raw_vals)
+
+
 
 
 def ocr():
@@ -438,6 +603,176 @@ def OldCoordinatesLetters(xml, png, output):
     # with open('picture_out.png', 'wb') as f:
     #     f.write(data)
 
+def bolded_by_height(xml, pic, output, rel_l, rel_r, rel_t, rel_b):
+    xml = ET.parse(xml)
+    root = xml.getroot()
+    print(pic)
+    height_cors = []
+    total_width = 0
+    total_height = 0
+    # c_p = 0
+    for page in root:
+        total_width = int(page.attrib['width'])
+        total_height = int(page.attrib['height'])
+        for block in page:
+            for t in block:
+                if "text" in t.tag:
+                    for par in t:
+                        for line in par:
+                            for lang in line:
+                                for char in lang:
+                                    # tot_text = tot_text + char.text
+                                    if (char.text == '.' or char.text == ':' or char.text == ' '):
+                                        # if (char.text == ':'):
+                                        #     c_p = 0
+                                        # else:
+                                        #     c_p += 1
+                                        continue
+                                    # c_p += 1
+                                    left = int(char.attrib['l'])
+                                    top = int(char.attrib['t'])
+                                    right = int(char.attrib['r'])
+                                    bottom = int(char.attrib['b'])
+                                    if ((char.text == '־' and left == 418 and top == 1238) or (
+                                            char.text == 'י' and left == 415 and top == 1237) or (
+                                            char.text == '~' and left == 608 and top == 215)):
+                                        # print("skipping")
+                                        continue
+                                    x0_y0_x1_y1 = [left, top, right, bottom]
+                                    w = right - left
+                                    h = bottom - top
+                                    # rel_l.append(float(left/total_width) * 100)
+                                    # rel_r.append(float(right/total_width) * 100)
+                                    # rel_t.append(float(top/total_height)* 100)
+                                    # rel_b.append(float(bottom/total_height) * 100)
+                                    rel_h = float(h/total_height) * 1000
+                                    rel_w = float(w/total_width) * 1000
+                                    # rel_height.append(rel_h)
+                                    # rel_width.append(rel_w)
+                                    # col_prox.append(c_p)
+                                    height_cors.append([rel_h, x0_y0_x1_y1])
+                                    # let_size = w * h
+    # return rel_l, rel_r, rel_t, rel_b
+    # return rel_height, rel_width, col_prox
+    # for i in height_cors:
+    #     print(i)
+    # draw boxes around bolded words
+    print("making pic for: " + output)
+    img = Image.open(pic).convert('RGBA')
+    img_2 = img.copy()
+    draw = ImageDraw.Draw(img_2)
+    for i in height_cors:
+        if i[0] <= 10:
+            draw.rectangle(i[1], outline="black", width=1)
+        elif i[0] < 55 and i[0] > 40:
+            draw.rectangle(i[1], outline="green", width=1)
+        elif i[0] > 55:
+            draw.rectangle(i[1], outline="red", width=1)
+    img_2.show()
+    img_2.save(output, "PNG")
+
+# use this method to add features to the dataframe by passing in the xml and all the features you want to add as lists
+# return the feature lists of data and add them to the dataframe
+def add_feature(xml_path, line_width, line_height, chars_per_line, line_num):
+    xml = ET.parse(xml_path)
+    root = xml.getroot()
+    print(xml_path)
+    total_width = 0
+    total_height = 0
+    first_line = True
+    line_chars = 0
+    num_line = 0
+    for page in root:
+        total_width = int(page.attrib['width'])
+        total_height = int(page.attrib['height'])
+        for block in page:
+            for t in block:
+                if "text" in t.tag:
+                    for par in t:
+                        for line in par:
+                            line_left = int(line.attrib['l'])
+                            line_top = int(line.attrib['t'])
+                            line_right = int(line.attrib['r'])
+                            line_bottom = int(line.attrib['b'])
+                            wid = line_right - line_left
+                            high = line_bottom - line_top
+                            rel_line_wid = float(wid/total_width) * 1000
+                            rel__line_high = float(high/total_height) * 1000
+                            if (first_line == False):
+                                for i in range(line_chars):
+                                    chars_per_line.append(line_chars)
+                                num_line += 1
+                            line_chars = 0
+                            for lang in line:
+                                for char in lang:
+                                    first_line = False
+                                    if (char.text == '.' or char.text == ':' or char.text == ' '):
+                                        continue
+                                    left = int(char.attrib['l'])
+                                    top = int(char.attrib['t'])
+                                    if ((char.text == '־' and left == 418 and top == 1238) or (
+                                            char.text == 'י' and left == 415 and top == 1237) or (
+                                            char.text == '~' and left == 608 and top == 215)):
+                                        print("skipping")
+                                        continue
+                                    line_width.append(rel_line_wid)
+                                    line_height.append(rel__line_high)
+                                    line_chars += 1
+                                    line_num.append(num_line)
+    # add in chars per line from the last line of the page
+    for i in range(line_chars):
+        chars_per_line.append(line_chars)
+    return line_width, line_height, chars_per_line, line_num
+
+
+def bolded_by_width(xml, pic, output):
+    xml = ET.parse(xml)
+    root = xml.getroot()
+    height_cors = []
+    for page in root:
+        for block in page:
+            for t in block:
+                if "text" in t.tag:
+                    for par in t:
+                        for line in par:
+                            for lang in line:
+                                for char in lang:
+                                    # tot_text = tot_text + char.text
+                                    if (char.text == '.' or char.text == ':' or char.text == ' '):
+                                        continue
+                                    left = int(char.attrib['l'])
+                                    top = int(char.attrib['t'])
+                                    right = int(char.attrib['r'])
+                                    bottom = int(char.attrib['b'])
+                                    # if ((char.text == '־' and left == 418 and top == 1238) or (
+                                    #         char.text == 'י' and left == 415 and top == 1237) or (
+                                    #         char.text == '~' and left == 608 and top == 215)):
+                                    #     print("skipping")
+                                    #     continue
+                                    x0_y0_x1_y1 = [left, top, right, bottom]
+                                    w = right - left
+                                    # h = bottom - top
+                                    height_cors.append([w, x0_y0_x1_y1])
+                                    # let_size = w * h
+
+    # draw boxes around bolded words
+    print("making pic for: " + output)
+    img = Image.open(pic).convert('RGBA')
+    img_2 = img.copy()
+    draw = ImageDraw.Draw(img_2)
+    for i in height_cors:
+        if i[0] < 25:
+            draw.rectangle(i[1], outline="black", width=1)
+        elif i[0] < 42 and i[0] > 25:
+            draw.rectangle(i[1], outline="green", width=1)
+        elif i[0] > 42:
+            draw.rectangle(i[1], outline="red", width=1)
+    # img_2.show()
+    img_2.save(output, "PNG")
+
+
+
+
 def CoordinatesUsingWords(xml, png):
     xml = ET.parse(xml)
     root = xml.getroot()
@@ -551,7 +886,7 @@ def CoordinatesUsingWords(xml, png):
     # full_name = r"C:\Users\emwil\Downloads\bolded letter average" + os.sep + name + "_test_bolded.png"
     # img_2.save(full_name, "PNG")
 
-def getCoordinates(xml, png, output, n, chars, counter):
+def getCoordinates(xml, png, output, n, chars, counter, count):
     text = " "
     xml = ET.parse(xml)
     root = xml.getroot()
@@ -574,9 +909,13 @@ def getCoordinates(xml, png, output, n, chars, counter):
     page_num = n.split('-')[1]
     print("name and page: " + str(name) + " " + str(page_num))
 
-    # for i in range(1, 20000):
-    #     obj['size_' + str(i)] = []
+    for i in range(1, 20000):
+        obj['size_' + str(i)] = []
+    total_width = 0
+    total_height = 0
     for page in root:
+        total_width = int(page.attrib['width'])
+        total_height = int(page.attrib['height'])
         for block in page:
             for t in block:
                 if "text" in t.tag:
@@ -588,6 +927,7 @@ def getCoordinates(xml, png, output, n, chars, counter):
                             text = text + '\n'
                             for lang in line:
                                 for char in lang:
+                                    count += 1
                                     # tot_text = tot_text + char.text
                                     text = text + char.text
                                     if (char.text == '.' or char.text == ':' or char.text == ' '):
@@ -597,9 +937,9 @@ def getCoordinates(xml, png, output, n, chars, counter):
                                     top = int(char.attrib['t'])
                                     right = int(char.attrib['r'])
                                     bottom = int(char.attrib['b'])
-                                    if ((char.text == '־' and left == 418 and top == 1238) or (char.text == 'י' and left == 415 and top == 1237) or (char.text == '~' and left == 608 and top == 215)):
-                                        print("skipping")
-                                        continue
+                                    # if ((char.text == '־' and left == 418 and top == 1238) or (char.text == 'י' and left == 415 and top == 1237) or (char.text == '~' and left == 608 and top == 215)):
+                                    #     print("skipping")
+                                    #     continue
                                     letter_count += 1
                                     letters.append(char)
                                     x0_y0_x1_y1 = (left, top, right, bottom)
@@ -608,10 +948,12 @@ def getCoordinates(xml, png, output, n, chars, counter):
                                     let_size = w * h
                                     let_num = ord(char.text)
                                     # print(ord(char.text), char.text)
-                                    # obj['size_' + str(let_num)].append(let_size)
+                                    obj['size_' + str(let_num)].append(let_size)
                                     let_sizes.append(let_size)
                                     text_size_dim.append([char.text, let_size, x0_y0_x1_y1])
                                     total_letter_size += let_size
+                                    # rel_h = float(h/total_height) * 1000
+                                    # rel_w = float(w/total_width) * 1000
                                     # total_num_chars = len(c) + 1
                                     # Order is: 1) Book Name, 2) Page Number, 3) Char, 4) Bolded, 5) Coordinates, 6) Size, 7) Height, 8) Width
                                     # 9) ASCII val, 10) counter, 11) Line Location, 12) Left, 13) Right, 14) Top, 15) Bottom
@@ -687,15 +1029,15 @@ def getCoordinates(xml, png, output, n, chars, counter):
         #         # print("actual size: " + str(i[1]))
         #         # print("mean + 3 std devs: " + str((means['mean'+str(num)]+(3* std_devs['stdev'+str(num)]))))
         #         draw.rectangle(i[2], outline="red", width=1)
-                # print("text: " + str(i[0]) + " size: " + str(i[1]))
-
-        # img_2.show()
+        #         # print("text: " + str(i[0]) + " size: " + str(i[1]))
+        #
+        # # img_2.show()
         # img_2.save(output, "PNG")
-
+        return count
         # num of charachters
         # print("num of charachters in this doc: " + str(len(text_size_dim)) + " in " + n)
         # print("total num of charachters seen so far: " + str(len(c)))
-        return text
+        # return text
 
 
 
@@ -828,6 +1170,7 @@ def gc(xml, png, output):
     let_sizes = []
     obj = {}
     lc = 0
+
 
     # for i in range(1, 20000):
     #     obj['size_' + str(i)] = []
@@ -1625,6 +1968,7 @@ def ground_truth_bold(path):
         elif (a[1] == False):
             draw.rectangle(a[2], outline='black', width=1)
     output = prev_pic.replace("processed_images\processed_images", "Ground Truth Pics")
+    # img.show()
     img.save(output)
     img.close()
 
@@ -1648,11 +1992,59 @@ def ground_truth_bold(path):
         # count += 1
         # img.save(pic)
 
+def find_clumps(path):
+    two_cols = pd.read_csv(path, encoding='utf-8-sig')
+    pic_bold_cors_height = []
+    # base = 10
+    b = 2
+    for rows in two_cols.itertuples():
+        # print(rows)
+        # print(rows[b])
+        # print(rows[b])
+        name = rows[b] + "-" + str(rows[b + 1]).zfill(3) + ".tif"
+        # print(name)
+        if (rows[b] == "mishivdavar"):
+            name = rows[b] + "-" + str(rows[b + 1]).zfill(2) + ".tif"
+        if (rows[b] == "zikukindenura"):
+            name = rows[b] + "-" + str(rows[b + 1]) + ".tif"
+        pic = r"C:\Users\emwil\Downloads\processed_images\processed_images" + os.sep + name
+        cor = [rows[13], rows[15], rows[14], rows[16]]
+        pic_bold_cors_height.append([pic, rows[b + 3], cor, rows[b + 15]])
+    print(pic_bold_cors_height[3])
+    input("press enter:")
+
+    prev_pic = (pic_bold_cors_height[0])[0]
+    output = prev_pic.replace("processed_images\processed_images", "height pics")
+    # print(output)
+    # print(prev_pic)
+    img = Image.open(prev_pic).convert('RGBA')
+    draw = ImageDraw.Draw(img)
+    # print("creted draw")
+    for a in pic_bold_cors_height:
+        # print(a)
+        if a[0] != prev_pic:
+            output = prev_pic.replace("processed_images\processed_images", "height pics")
+            img.save(output)
+            img.close()
+            print("Next Pic: " + a[0])
+            img = Image.open(a[0]).convert('RGBA')
+            prev_pic = a[0]
+            draw = ImageDraw.Draw(img)
+        # img = Image.open(a[0]).convert('RGBA')
+        if (a[1] == True):
+            if (a[3] <= 10):
+                draw.rectangle(a[2], outline='green', width=2)
+            else:
+                draw.rectangle(a[2], outline='red', width=2)
+        elif (a[1] == False):
+            draw.rectangle(a[2], outline='black', width=1)
+    output = prev_pic.replace("processed_images\processed_images", "height pics")
+    img.save(output)
+    img.close()
 
 if __name__ == '__main__':
-
     # do stuff to get xml file
-    # OldCoordinatesLetters(r"C:\Users\emwil\Downloads\einyitchk-46.xml", r"C:\Users\emwil\Downloads\einyitzchak-146.png", r"C:\Users\emwil\Downloads\einyitzchak-146_boxes.png")
+    # OldCoordinatesLetters(r"C:\Users\emwil\Downloads\ey_146.xml", r"C:\Users\emwil\Downloads\einyitzchak146.png", r"C:\Users\emwil\Downloads\einyitzchak-146_boxes.png")
     # # ein yitzchok
     # getCoordinates(r"C:\Users\emwil\Downloads\tests\ey_1.xml", r"C:\Users\emwil\Downloads\Telegram Desktop\einyitzchak-025.png")
     # getCoordinates(r"C:\Users\emwil\Downloads\tests\ey_2.xml", r"C:\Users\emwil\Downloads\Telegram Desktop\einyitzchak-032.png")
@@ -1685,34 +2077,84 @@ if __name__ == '__main__':
 
     # ocr()
 
+    # find_clumps(r"C:\Users\emwil\Downloads\two_cols.csv")
 
 
     # total_text = []
     # # # # print(df)
-    # chars = []
-    # counter = 0
+    chars = []
+    counter = 0
     # # # # # # #new files
     # # # names = []
     # # # line_pos = []
-    # path = r"C:\Users\emwil\Downloads\processed_images_xml"
-    # with os.scandir(path) as it:
-    #     for entry in it:
-    #         if entry.name.endswith(".xml") and entry.is_file():
+    relative_height = []
+    relative_width = []
+    colon_aprox = []
+    left = []
+    right = []
+    bottom = []
+    top = []
+    line_width = []
+    line_height = []
+    chars_per_line = []
+    num_per_book = []
+    line_num = []
+    # path = r"C:\Users\emwil\Downloads\bad_xml"
+    path = r"C:\Users\emwil\Downloads\processed_images_xml"
+    with os.scandir(path) as it:
+        for entry in it:
+            if entry.name.endswith(".xml") and entry.is_file():
     #             # if (entry.name != "masatbinyamin-013.tif_bold.xml"):
     #             #
     #             print(entry.name, entry.path)
-    #             pic = entry.name.removesuffix("_bold.xml")
-    #             name = pic.removesuffix(".tif")
+                pic = entry.name.removesuffix(".xml")
+                name = pic.removesuffix(".tif")
     #             # print("name: " + name)
     #             # names.append(name)
-    #             pic_path = r"C:\Users\emwil\Downloads\processed_images\processed_images" + os.sep + pic
+                pic_path = r"C:\Users\emwil\Downloads\bad_pics\low score images" + os.sep + pic
     #             # print("pic path: " + pic_path)
     #             output_path_name = r"C:\Users\emwil\Downloads\processed_images\bolded_processed_images" + os.sep + name + ".png"
-    #             # print(entry.path, pic_path, output_path_name)
+                output_path_name = r"C:\Users\emwil\Downloads\bad_bolded" + os.sep + name + ".png"
+                xml_path = entry.path
+                count = 0
+                # count = getCoordinates(xml_path, pic_path, output_path_name, name, chars, counter, count)
+                # num_per_book.append([name, count])
+    # print(entry.path, pic_path, output_path_name)
+    #             relative_height, relative_width, colon_aprox = bolded_by_height(xml_path, pic_path,
+    #                                                 output_path_name, relative_height, relative_width, colon_aprox)
+    #             left, right, top, bottom = bolded_by_height(xml_path, pic_path, output_path_name, left, right, top, bottom)
+                line_width, line_height, chars_per_line, line_num = add_feature(xml_path, line_width, line_height, chars_per_line, line_num)
+                # bolded_by_width(xml_path, pic_path, output_path_name)
     #             t = getCoordinates(entry.path, pic_path, output_path_name, name, chars, counter)
     #             # print(t)
     #             total_text.append(t)
 
+    # for i in range(6):
+    #     print(left[i], right[i], top[i], bottom[i])
+    # print(len(left), len(right), len(top), len(bottom))
+    # df = pd.DataFrame(data=num_per_book, columns=['Book', 'Num of Charachters'])
+    # df.to_csv(r"C:\Users\emwil\Downloads\Num_Chars.csv")
+    df = pd.read_csv(r"C:\Users\emwil\cs_projects\BoldDetection\data.csv", encoding='utf-8-sig')
+    print(len(df))
+    print(len(line_width), len(line_height), len(chars_per_line), len(line_num))
+    input("press enter if good: ")
+    df['line width'] = line_width
+    df['line height'] = line_height
+    df['charachters per line'] = chars_per_line
+    df['line number'] = line_num
+    df.to_csv(r"C:\Users\emwil\cs_projects\BoldDetection\data.csv", encoding='utf-8-sig')
+    # rel_size = []
+    # for i in range(len(relative_height)):
+    #     rel_size.append((relative_height[i] * relative_width[i]))
+    # df['rel_size'] = rel_size
+    # df['rel_height'] = relative_height
+    # df['rel_width'] = relative_width
+    # df['col_aprox'] = colon_aprox
+    # df['rel_left'] = left
+    # df['rel_right'] = right
+    # df['rel_top'] = top
+    # df['rel_bottom'] = bottom
+    # df.to_csv(r"C:\Users\emwil\cs_projects\BoldDetection\data.csv", encoding='utf-8-sig')
     # Adding Column for Position of Charchter in Line
     # for i in line_pos:
     #     print(i)
@@ -1750,6 +2192,9 @@ if __name__ == '__main__':
     c_path = r'C:\Users\emwil\cs_projects\BoldDetection\data.csv'
     csv_path = r'C:\Users\emwil\Downloads\csv_data.csv'
     csv_1 = r"C:\Users\emwil\Downloads\csv_data_1.csv"
+
+    # train(c_path)
+
     # csv_1 = r"C:\Users\emwil\Downloads\csv_data_1e.xlsx"
     # fill_bold(c_path)
     # ground_truth_bold(c_path)
