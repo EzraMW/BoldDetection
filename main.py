@@ -1934,7 +1934,6 @@ def ground_truth_bold(path):
         # print(rows[b+4])
         # print(type(rows[b+4]))
         cor = rows[b+4].removeprefix('(').removesuffix(')').split(', ')
-        # cor = rows[b-4].removeprefix('[').removesuffix(']').split(', ')
         c = []
         for i in cor:
             # c.__add__(int(i))
@@ -2042,6 +2041,161 @@ def find_clumps(path):
     img.save(output)
     img.close()
 
+def find_width(path):
+    two_cols = pd.read_csv(path, encoding='utf-8-sig')
+    pic_bold_cors_width = []
+    # base = 10
+    b = 4
+    for rows in two_cols.itertuples():
+        # print(rows)
+        # print(rows[b])
+        # input("press enter: ")
+        name = rows[b] + "-" + str(rows[b + 1]).zfill(3) + ".tif"
+        # print(name)
+        if (rows[b] == "mishivdavar"):
+            name = rows[b] + "-" + str(rows[b + 1]).zfill(2) + ".tif"
+        if (rows[b] == "zikukindenura"):
+            name = rows[b] + "-" + str(rows[b + 1]) + ".tif"
+        pic = r"C:\Users\emwil\Downloads\processed_images\processed_images" + os.sep + name
+        cor = [rows[15], rows[17], rows[16], rows[18]]
+        pic_bold_cors_width.append([pic, rows[b + 3], cor, rows[27]])
+    print(pic_bold_cors_width[3])
+    # input("press enter:")
+
+    prev_pic = (pic_bold_cors_width[0])[0]
+    output = prev_pic.replace("processed_images\processed_images", "width pics")
+    # print(output)
+    # print(prev_pic)
+    img = Image.open(prev_pic).convert('RGBA')
+    draw = ImageDraw.Draw(img)
+    # print("creted draw")
+    for a in pic_bold_cors_width:
+        # print(a)
+        if a[0] != prev_pic:
+            output = prev_pic.replace("processed_images\processed_images", "width pics")
+            img.save(output)
+            img.close()
+            print("Next Pic: " + a[0])
+            img = Image.open(a[0]).convert('RGBA')
+            prev_pic = a[0]
+            draw = ImageDraw.Draw(img)
+        # img = Image.open(a[0]).convert('RGBA')
+        if (a[1] == True):
+            if (a[3] <= 450):
+                draw.rectangle(a[2], outline='green', width=2)
+            elif (a[3] >= 550):
+                draw.rectangle(a[2], outline='blue', width=2)
+            else:
+                draw.rectangle(a[2], outline='red', width=2)
+        elif (a[1] == False):
+            draw.rectangle(a[2], outline='black', width=1)
+    output = prev_pic.replace("processed_images\processed_images", "width pics")
+    img.save(output)
+    img.close()
+
+def find_line_chars(path):
+    two_cols = pd.read_csv(path, encoding='utf-8-sig')
+    pic_bold_cors_chars = []
+    # base = 10
+    b = 4
+    for rows in two_cols.itertuples():
+        # print(rows)
+        # print(rows[b])
+        # input("press enter: ")
+        name = rows[b] + "-" + str(rows[b + 1]).zfill(3) + ".tif"
+        # print(name)
+        if (rows[b] == "mishivdavar"):
+            name = rows[b] + "-" + str(rows[b + 1]).zfill(2) + ".tif"
+        if (rows[b] == "zikukindenura"):
+            name = rows[b] + "-" + str(rows[b + 1]) + ".tif"
+        pic = r"C:\Users\emwil\Downloads\processed_images\processed_images" + os.sep + name
+        cor = [rows[15], rows[17], rows[16], rows[18]]
+        pic_bold_cors_chars.append([pic, rows[b + 3], cor, rows[29]])
+    print(pic_bold_cors_chars[3])
+    input("press enter:")
+
+    prev_pic = (pic_bold_cors_chars[0])[0]
+    output = prev_pic.replace("processed_images\processed_images", "chars pics")
+    # print(output)
+    # print(prev_pic)
+    img = Image.open(prev_pic).convert('RGBA')
+    draw = ImageDraw.Draw(img)
+    # print("creted draw")
+    for a in pic_bold_cors_chars:
+        # print(a)
+        if a[0] != prev_pic:
+            output = prev_pic.replace("processed_images\processed_images", "chars pics")
+            img.save(output)
+            img.close()
+            print("Next Pic: " + a[0])
+            img = Image.open(a[0]).convert('RGBA')
+            prev_pic = a[0]
+            draw = ImageDraw.Draw(img)
+        # img = Image.open(a[0]).convert('RGBA')
+        if (a[1] == True):
+            if (a[3] > 15):
+                draw.rectangle(a[2], outline='green', width=2)
+            else:
+                draw.rectangle(a[2], outline='red', width=2)
+        elif (a[1] == False):
+            draw.rectangle(a[2], outline='black', width=1)
+    output = prev_pic.replace("processed_images\processed_images", "chars pics")
+    img.save(output)
+    img.close()
+
+
+def show_predictions(csv_path):
+    df = pd.read_csv(csv_path, encoding='utf-8-sig')
+    pic_bold_cors = []
+    # base = 10
+    b = 1
+    for rows in df.itertuples():
+        # print(rows)
+        # print(rows[b])
+        # print(rows[b])
+        name = rows[b] + "-" + str(rows[b + 1]).zfill(3) + ".tif"
+        # print(name)
+        if (rows[b] == "mishivdavar"):
+            name = rows[b] + "-" + str(rows[b + 1]).zfill(2) + ".tif"
+        pic = r"C:\Users\emwil\Downloads\processed_images\processed_images" + os.sep + name
+        # cor = [rows[13], rows[15], rows[14], rows[16]]
+        cor = rows[b+2].removeprefix('(').removesuffix(')').split(', ')
+        c = []
+        for i in cor:
+            c.append(int(i))
+        pic_bold_cors.append([pic, rows[b + 3], c])
+    print(pic_bold_cors[3])
+    input("press enter:")
+
+    prev_pic = (pic_bold_cors[0])[0]
+    output = prev_pic.replace("processed_images\processed_images", "predict pics")
+    # print(output)
+    # print(prev_pic)
+    img = Image.open(prev_pic).convert('RGBA')
+    draw = ImageDraw.Draw(img)
+    # print("creted draw")
+    for a in pic_bold_cors:
+        # print(a)
+        if a[0] != prev_pic:
+            output = prev_pic.replace("processed_images\processed_images", "predict pics")
+            img.save(output)
+            img.close()
+            print("Next Pic: " + a[0])
+            img = Image.open(a[0]).convert('RGBA')
+            prev_pic = a[0]
+            draw = ImageDraw.Draw(img)
+        # img = Image.open(a[0]).convert('RGBA')
+        if (a[1] == True):
+            # if (a[3] <= 10):
+            #     draw.rectangle(a[2], outline='green', width=2)
+            # else:
+            draw.rectangle(a[2], outline='red', width=2)
+        elif (a[1] == False):
+            draw.rectangle(a[2], outline='black', width=1)
+    output = prev_pic.replace("processed_images\processed_images", "predict pics")
+    img.save(output)
+    img.close()
+
 if __name__ == '__main__':
     # do stuff to get xml file
     # OldCoordinatesLetters(r"C:\Users\emwil\Downloads\ey_146.xml", r"C:\Users\emwil\Downloads\einyitzchak146.png", r"C:\Users\emwil\Downloads\einyitzchak-146_boxes.png")
@@ -2077,8 +2231,9 @@ if __name__ == '__main__':
 
     # ocr()
 
-    # find_clumps(r"C:\Users\emwil\Downloads\two_cols.csv")
-
+    # find_width(r"C:\Users\emwil\Downloads\two_cols.csv")
+    # find_line_chars(r"C:\Users\emwil\Downloads\two_cols.csv")
+    show_predictions(r"C:\Users\emwil\Downloads\pred_df.csv")
 
     # total_text = []
     # # # # print(df)
@@ -2123,7 +2278,7 @@ if __name__ == '__main__':
     #             relative_height, relative_width, colon_aprox = bolded_by_height(xml_path, pic_path,
     #                                                 output_path_name, relative_height, relative_width, colon_aprox)
     #             left, right, top, bottom = bolded_by_height(xml_path, pic_path, output_path_name, left, right, top, bottom)
-                line_width, line_height, chars_per_line, line_num = add_feature(xml_path, line_width, line_height, chars_per_line, line_num)
+    #             line_width, line_height, chars_per_line, line_num = add_feature(xml_path, line_width, line_height, chars_per_line, line_num)
                 # bolded_by_width(xml_path, pic_path, output_path_name)
     #             t = getCoordinates(entry.path, pic_path, output_path_name, name, chars, counter)
     #             # print(t)
@@ -2134,15 +2289,15 @@ if __name__ == '__main__':
     # print(len(left), len(right), len(top), len(bottom))
     # df = pd.DataFrame(data=num_per_book, columns=['Book', 'Num of Charachters'])
     # df.to_csv(r"C:\Users\emwil\Downloads\Num_Chars.csv")
-    df = pd.read_csv(r"C:\Users\emwil\cs_projects\BoldDetection\data.csv", encoding='utf-8-sig')
-    print(len(df))
-    print(len(line_width), len(line_height), len(chars_per_line), len(line_num))
-    input("press enter if good: ")
-    df['line width'] = line_width
-    df['line height'] = line_height
-    df['charachters per line'] = chars_per_line
-    df['line number'] = line_num
-    df.to_csv(r"C:\Users\emwil\cs_projects\BoldDetection\data.csv", encoding='utf-8-sig')
+    # df = pd.read_csv(r"C:\Users\emwil\cs_projects\BoldDetection\data.csv", encoding='utf-8-sig')
+    # print(len(df))
+    # print(len(line_width), len(line_height), len(chars_per_line), len(line_num))
+    # input("press enter if good: ")
+    # df['line width'] = line_width
+    # df['line height'] = line_height
+    # df['charachters per line'] = chars_per_line
+    # df['line number'] = line_num
+    # df.to_csv(r"C:\Users\emwil\cs_projects\BoldDetection\data.csv", encoding='utf-8-sig')
     # rel_size = []
     # for i in range(len(relative_height)):
     #     rel_size.append((relative_height[i] * relative_width[i]))
