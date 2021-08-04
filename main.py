@@ -430,14 +430,14 @@ def OldCoordinatesLetters(xml, png, output):
     total_size = 0
     curr = []
     word = []
-    total_letter_size = 0
-    letter_count = 0
-    letters = []
-    letters_text_size_dim = []
-    let_sizes = []
-    obj = {}
-    for i in range(1, 20000):
-        obj['size_' + str(i)] = []
+    # total_letter_size = 0
+    # letter_count = 0
+    # letters = []
+    # letters_text_size_dim = []
+    # let_sizes = []
+    # obj = {}
+    # for i in range(1, 20000):
+    #     obj['size_' + str(i)] = []
     for page in root:
         for block in page:
             for t in block:
@@ -517,24 +517,24 @@ def OldCoordinatesLetters(xml, png, output):
                                         curr.append(char)
                                         word.append(char.text)
                                         # print(char.text)
-                                        letter_count += 1
-                                        letters.append(char)
-                                        left = int(char.attrib['l'])
-                                        top = int(char.attrib['t'])
-                                        right = int(char.attrib['r'])
-                                        bottom = int(char.attrib['b'])
-                                        x0_y0_x1_y1 = [left, top, right, bottom]
-                                        w = right - left
-                                        h = bottom - top
-                                        let_size = w * h
-                                        let_num = ord(char.text)
+                                        # letter_count += 1
+                                        # letters.append(char)
+                                        # left = int(char.attrib['l'])
+                                        # top = int(char.attrib['t'])
+                                        # right = int(char.attrib['r'])
+                                        # bottom = int(char.attrib['b'])
+                                        # x0_y0_x1_y1 = [left, top, right, bottom]
+                                        # w = right - left
+                                        # h = bottom - top
+                                        # let_size = w * h
+                                        # let_num = ord(char.text)
                                         # print(ord(char.text), char.text)
-                                        obj['size_' + str(let_num)].append(let_size)
-                                        let_sizes.append(let_size)
-                                        letters_text_size_dim.append([char.text, let_size, x0_y0_x1_y1])
-                                        total_letter_size += let_size
+                                        # obj['size_' + str(let_num)].append(let_size)
+                                        # let_sizes.append(let_size)
+                                        # letters_text_size_dim.append([char.text, let_size, x0_y0_x1_y1])
+                                        # total_letter_size += let_size
 
-    avg_size = total_size / num_words
+    # avg_size = total_size / num_words
     # print(total_size, num_words)
     # print(avg_size)
     count = 0
@@ -545,48 +545,49 @@ def OldCoordinatesLetters(xml, png, output):
     for i in all_info_words:
         # print(i)
         # print(i[0])
-        # draw.rectangle(i[0], outline="red", width=2)
+        draw.rectangle(i[0], outline="black", width=1)
         tot += i[1]
         count += 1
     # print(tot/count)
     # img_2.show()
+    img_2.save(output, "PNG")
     # img = Image.open(r"C:\Users\emwil\Downloads\rashbameyuchas-030.png").convert('RGBA')
 
-    print("     Now Letters:       ")
-    print(total_letter_size / letter_count)
-    mean = statistics.mean(let_sizes)
-    std_dev = statistics.stdev(let_sizes)
-    print("total mean: " + str(mean))
-    print("total standard deviation: " + str(std_dev))
-    means = {}
-    std_devs = {}
-    for i in range(1, 20000):
-        if (len(obj['size_' + str(i)]) > 1):
-            means['mean' + str(i)] = statistics.mean(obj['size_' + str(i)])
-            std_devs['stdev' + str(i)] = statistics.stdev(obj['size_' + str(i)])
-        else:
-            means['mean' + str(i)] = 0
-            std_devs['stdev' + str(i)] = 0
-    for i in means:
-        if means[i] != 0:
-            print(means[i])
-    # print(means)
-    # print(std_devs)
-    for i in letters_text_size_dim:
-        # print("text: " + str(i[0]) + " size: " + str(i[1]))
-        # print("dim: " + str((i[2])))
-        num = ord(i[0])
-        if (means['mean' + str(num)] == 0 or std_devs['stdev' + str(num)] == 0):
-            continue
-        # print(i[0])
-        if (i[1] < (means['mean' + str(num)] + (3 * std_devs['stdev' + str(num)]))):
-            draw.rectangle(i[2], outline="black", width=1)
-        else:
-            draw.rectangle(i[2], outline="red", width=1)
-            # print("text: " + str(i[0]) + " size: " + str(i[1]))
-
-    img_2.show()
-    img_2.save(output, "PNG")
+    # print("     Now Letters:       ")
+    # print(total_letter_size / letter_count)
+    # mean = statistics.mean(let_sizes)
+    # std_dev = statistics.stdev(let_sizes)
+    # print("total mean: " + str(mean))
+    # print("total standard deviation: " + str(std_dev))
+    # means = {}
+    # std_devs = {}
+    # for i in range(1, 20000):
+    #     if (len(obj['size_' + str(i)]) > 1):
+    #         means['mean' + str(i)] = statistics.mean(obj['size_' + str(i)])
+    #         std_devs['stdev' + str(i)] = statistics.stdev(obj['size_' + str(i)])
+    #     else:
+    #         means['mean' + str(i)] = 0
+    #         std_devs['stdev' + str(i)] = 0
+    # for i in means:
+    #     if means[i] != 0:
+    #         print(means[i])
+    # # print(means)
+    # # print(std_devs)
+    # for i in letters_text_size_dim:
+    #     # print("text: " + str(i[0]) + " size: " + str(i[1]))
+    #     # print("dim: " + str((i[2])))
+    #     num = ord(i[0])
+    #     if (means['mean' + str(num)] == 0 or std_devs['stdev' + str(num)] == 0):
+    #         continue
+    #     # print(i[0])
+    #     if (i[1] < (means['mean' + str(num)] + (3 * std_devs['stdev' + str(num)]))):
+    #         draw.rectangle(i[2], outline="black", width=1)
+    #     else:
+    #         draw.rectangle(i[2], outline="red", width=1)
+    #         # print("text: " + str(i[0]) + " size: " + str(i[1]))
+    #
+    # img_2.show()
+    # img_2.save(output, "PNG")
     # new = png.split("\\")
     # name = ""
     # for i in new:
@@ -2233,7 +2234,7 @@ if __name__ == '__main__':
 
     # find_width(r"C:\Users\emwil\Downloads\two_cols.csv")
     # find_line_chars(r"C:\Users\emwil\Downloads\two_cols.csv")
-    show_predictions(r"C:\Users\emwil\Downloads\pred_df.csv")
+    # show_predictions(r"C:\Users\emwil\Downloads\pred_df.csv")
 
     # total_text = []
     # # # # print(df)
@@ -2262,16 +2263,18 @@ if __name__ == '__main__':
     #             # if (entry.name != "masatbinyamin-013.tif_bold.xml"):
     #             #
     #             print(entry.name, entry.path)
-                pic = entry.name.removesuffix(".xml")
+                pic = entry.name.removesuffix("_bold.xml")
                 name = pic.removesuffix(".tif")
     #             # print("name: " + name)
     #             # names.append(name)
-                pic_path = r"C:\Users\emwil\Downloads\bad_pics\low score images" + os.sep + pic
+
+                pic_path = r"C:\Users\emwil\Downloads\processed_images\processed_images" + os.sep + pic
     #             # print("pic path: " + pic_path)
     #             output_path_name = r"C:\Users\emwil\Downloads\processed_images\bolded_processed_images" + os.sep + name + ".png"
-                output_path_name = r"C:\Users\emwil\Downloads\bad_bolded" + os.sep + name + ".png"
+                output_path_name = r"C:\Users\emwil\Downloads\bolded_by_word" + os.sep + name + ".png"
                 xml_path = entry.path
                 count = 0
+                OldCoordinatesLetters(xml_path, pic_path, output_path_name)
                 # count = getCoordinates(xml_path, pic_path, output_path_name, name, chars, counter, count)
                 # num_per_book.append([name, count])
     # print(entry.path, pic_path, output_path_name)
