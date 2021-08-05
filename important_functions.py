@@ -37,7 +37,7 @@ def get_text(directory_path, output, suffix):
 
 # get a list of the coordinates of each word from the image, from it's xml form from ABBYY, and draw bounding boxes around
 # each word
-def getCoordinatesOfWords(xml, png, output):
+def get_coordinates_of_words(xml, png, output):
     xml = ET.parse(xml)
     root = xml.getroot()
     all_info_words = []
@@ -124,7 +124,7 @@ def getCoordinatesOfWords(xml, png, output):
 # labels that by drawing BLACK bounding boxes around regular words and RED around predicted Bolded ones.
 # Bold words are predicted as being double the size of the average word size and this can be adjusted for more/less
 # precise predictions
-def BoldedCoordinatesBasedOnWords(xml, png, output):
+def bolded_coordinates_based_on_words(xml, png, output):
     xml = ET.parse(xml)
     root = xml.getroot()
     all_info_words = []
@@ -218,7 +218,7 @@ def BoldedCoordinatesBasedOnWords(xml, png, output):
 # Boldness is predicted based on individual character information and, specifically, when it is more than 3x bigger than
 # the average size of that character (identified by its ASCII value)
 # Additionally, this algorithm can be used to return important information about each character to add to the dataset
-def getCoordinates(xml, png, output, n, chars, counter, count):
+def get_coordinates(xml, png, output, n, chars, counter, count):
     text = " "
     xml = ET.parse(xml)
     root = xml.getroot()
@@ -371,6 +371,60 @@ def getCoordinates(xml, png, output, n, chars, counter, count):
         # print("total num of characters seen so far: " + str(len(c)))
         # return text
 
+# use this method to add features to the dataframe by passing in the xml and all the features you want to add as lists
+# return the feature lists of data and add them to the dataframe
+# This particular instance will generate lists of line_width, line_height, chars_per_line, and line_num and return them
+# to be added to the dataframe but they can be replaced and adjusted to add any desired feature
+def add_feature(xml_path, line_width, line_height, chars_per_line, line_num):
+    xml = ET.parse(xml_path)
+    root = xml.getroot()
+    total_width = 0
+    total_height = 0
+    first_line = True
+    line_chars = 0
+    num_line = 0
+    for page in root:
+        total_width = int(page.attrib['width'])
+        total_height = int(page.attrib['height'])
+        for block in page:
+            for t in block:
+                if "text" in t.tag:
+                    for par in t:
+                        for line in par:
+                            line_left = int(line.attrib['l'])
+                            line_top = int(line.attrib['t'])
+                            line_right = int(line.attrib['r'])
+                            line_bottom = int(line.attrib['b'])
+                            wid = line_right - line_left
+                            high = line_bottom - line_top
+                            rel_line_wid = float(wid/total_width) * 1000
+                            rel__line_high = float(high/total_height) * 1000
+                            if (first_line == False):
+                                for i in range(line_chars):
+                                    chars_per_line.append(line_chars)
+                                num_line += 1
+                            line_chars = 0
+                            for lang in line:
+                                for char in lang:
+                                    first_line = False
+                                    if (char.text == '.' or char.text == ':' or char.text == ' '):
+                                        continue
+                                    left = int(char.attrib['l'])
+                                    top = int(char.attrib['t'])
+                                    if ((char.text == '־' and left == 418 and top == 1238) or (
+                                            char.text == 'י' and left == 415 and top == 1237) or (
+                                            char.text == '~' and left == 608 and top == 215)):
+                                        continue
+                                    line_width.append(rel_line_wid)
+                                    line_height.append(rel__line_high)
+                                    line_chars += 1
+                                    line_num.append(num_line)
+    # add in chars per line from the last line of the page
+    for i in range(line_chars):
+        chars_per_line.append(line_chars)
+    return line_width, line_height, chars_per_line, line_num
+
+
 # Method to simply copy files/pictures from one directory (original_path) to another (new_out_path)
 def move_files():
     original_path = r"C:\Users\emwil\Downloads\processed_images\cleaned_images"
@@ -381,7 +435,8 @@ def move_files():
                 new_out_path = r"C:\Users\emwil\Downloads\processed_images\cleaned_images_png" + os.sep + entry.name
                 cv2.imwrite(new_out_path, image)
 
-# input the csv_path for the predictions
+# input the csv_path for an csv file of the predicted boldness of each indexed character and its coordinates to visualize
+# the results of the trained model and see where and, ultimatly, why it went wrong and right.
 def show_predictions(csv_path):
     df = pd.read_csv(csv_path, encoding='utf-8-sig')
     pic_bold_cors = []
@@ -658,3 +713,23 @@ def find_line_chars(path):
     output = prev_pic.replace("processed_images\processed_images", "chars pics")
     img.save(output)
     img.close()
+
+
+
+if __name__ == '__main__':
+    # iterate through directory of xml files to create the dataframe, visualize the boldness, add features to the dataframe
+    # or any of the functions possible
+
+    # path = path to xml directory
+    path = r"C:\Users\emwil\Downloads\processed_images_xml"
+    with os.scandir(path) as it:
+        for entry in it:
+            if entry.name.endswith(".xml") and entry.is_file():
+                pic = entry.name.removesuffix("_bold.xml")
+                name = pic.removesuffix(".tif")
+                pic_path = r"C:\Users\emwil\Downloads\processed_images\processed_images" + os.sep + pic
+                output_path_name = r"C:\Users\emwil\Downloads\bolded_by_word" + os.sep + name + ".png"
+                xml_path = entry.path
+                count = 0
+                # get_coordinates(xml_path, pic_path, output_path_name, name, chars)
+                # add_features(...) etc.
